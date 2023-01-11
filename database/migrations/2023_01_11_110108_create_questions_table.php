@@ -15,8 +15,9 @@ return new class extends Migration
     {
         Schema::create('questions', function (Blueprint $table) {
             $table->id();
-            $table->string('action');
+            $table->string('title');
             $table->string('content');
+            $table->string('media');
             $table->enum('user_role', [
                 'teacher',
                 'student',
