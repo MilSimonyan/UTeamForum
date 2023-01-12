@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\PostController;
+use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -14,6 +16,12 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+Route::middleware('auth')->controller(PostController::class)
+    ->prefix('/post')
+    ->group(function () {
+        Route::GET('/', 'index');
+        Route::POST('/', 'store');
+        Route::GET('/{id}', 'show');
+        Route::DELETE('/{id}', 'destroy');
+    });
+
