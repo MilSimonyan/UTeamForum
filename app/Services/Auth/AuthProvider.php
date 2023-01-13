@@ -2,6 +2,7 @@
 
 namespace App\Services\Auth;
 
+use App\Entities\User;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Auth\EloquentUserProvider;
@@ -88,7 +89,7 @@ class AuthProvider extends EloquentUserProvider
      *
      * @return \Illuminate\Contracts\Auth\Authenticatable|null
      */
-    public function retrieveByAuthGateway() : null|array
+    public function retrieveByAuthGateway() : null|string
     {
         try {
             $client = new Client();
@@ -99,8 +100,8 @@ class AuthProvider extends EloquentUserProvider
                     'Cookie' => "laravel_session={$session}"
                 ]
             ]);
-
-            $user = json_decode($user_response->getBody(), true);
+dd($user_response->getBody()->getContents());
+            $user = User::fromJson(json_decode($user_response->getBody())->data);//TODO will be a change remove data
 
             return $user;
         } catch (GuzzleException $ex) {

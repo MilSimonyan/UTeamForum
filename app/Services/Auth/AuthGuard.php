@@ -2,9 +2,9 @@
 
 namespace App\Services\Auth;
 
+use App\Entities\User;
 use Illuminate\Auth\SessionGuard;
 use Illuminate\Contracts\Auth\Authenticatable;
-use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Support\Timebox;
 use Symfony\Component\HttpFoundation\Request;
@@ -32,10 +32,9 @@ class AuthGuard extends SessionGuard
     /**
      * Get the currently authenticated user.
      *
-     * @return \Illuminate\Contracts\Auth\Authenticatable|null
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @return \App\Entities\User|\Illuminate\Contracts\Auth\Authenticatable|null
      */
-    public function user() : null|array
+    public function user() : null|User|Authenticatable
     {
         if ($this->user !== null) {
             return $this->user;
