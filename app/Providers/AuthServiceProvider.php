@@ -3,8 +3,8 @@
 namespace App\Providers;
 
 // use Illuminate\Support\Facades\Gate;
-use App\Services\Auth\AuthGuard;
-use App\Services\Auth\AuthProvider;
+use App\Services\Auth\SsoGuard;
+use App\Services\Auth\SsoProvider;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Auth;
@@ -29,17 +29,19 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        Auth::provider('auth', function (Application $app, array $config) {
-            return new AuthProvider($app['hash']);
+        Auth::provider('sso', function (Application $app, array $config) {
+            return new SsoProvider($app['hash']);
         });
 
-        Auth::extend('auth', function (Application $app, $name, array $config) {
-            return new AuthGuard(
+        Auth::extend('sso', function (Application $app, $name, array $config) {
+            return new SsoGuard(
                 $name,
-                $this->app->get(AuthProvider::class),
+                $this->app->get(SsoProvider::class),
                 $this->app['session.store'],
             );
         });
+
+
 
 
         //

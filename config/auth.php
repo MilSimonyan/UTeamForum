@@ -14,7 +14,7 @@ return [
     */
 
     'defaults' => [
-        'guard' => 'auth',
+        'guard' => 'sso',
     ],
 
     /*
@@ -35,9 +35,9 @@ return [
     */
 
     'guards' => [
-        'auth' => [
-            'driver' => 'auth',
-            'provider' => 'auth',
+        'sso' => [
+            'driver' => 'sso',
+            'provider' => 'sso',
         ],
     ],
 

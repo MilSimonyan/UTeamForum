@@ -11,11 +11,8 @@ class PostController extends Controller
 {
     protected PostRepository $postRepository;
 
-    protected array $user;
-
     public function __construct(PostRepository $postRepository, Request $request)
     {
-        $this->user = $request->user()['data'];
         $this->postRepository = $postRepository;
     }
 

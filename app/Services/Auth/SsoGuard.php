@@ -2,24 +2,23 @@
 
 namespace App\Services\Auth;
 
-use App\Entities\User;
 use Illuminate\Auth\SessionGuard;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Support\Timebox;
 use Symfony\Component\HttpFoundation\Request;
 
-class AuthGuard extends SessionGuard
+class SsoGuard extends SessionGuard
 {
     /**
      * The user provider implementation.
      *
-     * @var \App\Services\Auth\AuthProvider $provider
+     * @var \App\Services\Auth\SsoProvider $provider
      */
     protected $provider;
 
     public function __construct($name,
-                                AuthProvider $provider,
+                                SsoProvider $provider,
                                 Session $session,
                                 Request $request = null,
                                 Timebox $timebox = null)
@@ -32,9 +31,9 @@ class AuthGuard extends SessionGuard
     /**
      * Get the currently authenticated user.
      *
-     * @return \App\Entities\User|\Illuminate\Contracts\Auth\Authenticatable|null
+     * @return Authenticatable|null
      */
-    public function user() : null|User|Authenticatable
+    public function user() : null|Authenticatable
     {
         if ($this->user !== null) {
             return $this->user;

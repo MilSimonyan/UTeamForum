@@ -3,6 +3,8 @@
 namespace App\Services\Auth;
 
 use App\Entities\User;
+use App\Facades\HttpCaller;
+use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Auth\EloquentUserProvider;
@@ -10,7 +12,7 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 use Illuminate\Support\Facades\Cookie;
 
-class AuthProvider extends EloquentUserProvider
+class SsoProvider extends EloquentUserProvider
 {
     public function __construct(HasherContract $hasher, $model = null)
     {
@@ -23,7 +25,7 @@ class AuthProvider extends EloquentUserProvider
      *
      * @param mixed $identifier
      *
-     * @return \Illuminate\Contracts\Auth\Authenticatable|null
+     * @return Authenticatable|null
      */
     public function retrieveById($identifier) : ?Authenticatable
     {
@@ -37,7 +39,7 @@ class AuthProvider extends EloquentUserProvider
      * @param mixed  $identifier
      * @param string $token
      *
-     * @return \Illuminate\Contracts\Auth\Authenticatable|null
+     * @return Authenticatable|null
      */
     public function retrieveByToken($identifier, $token) : ?Authenticatable
     {
@@ -48,7 +50,7 @@ class AuthProvider extends EloquentUserProvider
      * Update the "remember me" token for the given user in storage.
      * Method is not relevant for our authentication mechanism.
      *
-     * @param \Illuminate\Contracts\Auth\Authenticatable $user
+     * @param Authenticatable $user
      * @param string                                     $token
      *
      * @return void
@@ -63,7 +65,7 @@ class AuthProvider extends EloquentUserProvider
      *
      * @param array $credentials
      *
-     * @return \Illuminate\Contracts\Auth\Authenticatable|null
+     * @return Authenticatable|null
      */
     public function retrieveByCredentials(array $credentials) : ?Authenticatable
     {
@@ -74,7 +76,7 @@ class AuthProvider extends EloquentUserProvider
      * Validate a user against the given credentials.
      * Method is not relevant for our authentication mechanism.
      *
-     * @param \Illuminate\Contracts\Auth\Authenticatable $user
+     * @param Authenticatable $user
      * @param array                                      $credentials
      *
      * @return bool
@@ -87,24 +89,16 @@ class AuthProvider extends EloquentUserProvider
     /**
      * Retrieve a user by sso gateway.
      *
-     * @return \Illuminate\Contracts\Auth\Authenticatable|null
+     * @return Authenticatable|null
      */
-    public function retrieveByAuthGateway() : null|string
+    public function retrieveByAuthGateway() : null|Authenticatable
     {
         try {
-            $client = new Client();
-            $session = Cookie::get('laravel_session');
+            $response = HttpCaller::get('http://account.u-team.com/user');
+            $user = new User();
 
-            $user_response = $client->get("http://account.u-team.com/user", [
-                'headers' => [
-                    'Cookie' => "laravel_session={$session}"
-                ]
-            ]);
-dd($user_response->getBody()->getContents());
-            $user = User::fromJson(json_decode($user_response->getBody())->data);//TODO will be a change remove data
-
-            return $user;
-        } catch (GuzzleException $ex) {
+            return $user->fromStdClass($response);
+        } catch (Exception $ex) {
             return null;
         }
     }

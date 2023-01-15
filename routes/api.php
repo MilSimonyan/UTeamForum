@@ -1,8 +1,6 @@
 <?php
 
 use App\Http\Controllers\PostController;
-use GuzzleHttp\Client;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth')->controller(PostController::class)
+Route::middleware('auth:sso')->controller(PostController::class)
     ->prefix('/post')
     ->group(function () {
         Route::GET('/', 'index');
@@ -25,3 +23,6 @@ Route::middleware('auth')->controller(PostController::class)
         Route::DELETE('/{id}', 'destroy');
     });
 
+Route::middleware('auth:sso')->get('/user', function (){
+    return new \Illuminate\Http\JsonResponse(\Illuminate\Support\Facades\Auth::user());
+});
