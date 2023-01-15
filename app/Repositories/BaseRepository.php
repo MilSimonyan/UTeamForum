@@ -40,4 +40,71 @@ class BaseRepository
     {
         return $this->model->all();
     }
+
+    /**
+     * Find single model by given criteria.
+     *
+     * @param array $criteria
+     *
+     * @param bool  $firstOrFail
+     *
+     * @return \Illuminate\Database\Eloquent\Model|null
+     */
+    public function findOneBy(array $criteria, bool $firstOrFail = true) : ?Model
+    {
+        $query = $this->applyCriteria($criteria);
+
+        return $firstOrFail ? $query->firstOrFail() : $query->first();
+    }
+
+    /**
+     * Find Many models by given criteria.
+     *
+     * @param array $criteria
+     *
+     * @return \Illuminate\Database\Eloquent\Model|null
+     */
+    public function findManyBy(array $criteria) : null|Collection
+    {
+        $query = $this->applyCriteria($criteria);
+
+        return $query->get();
+    }
+
+    /**
+     * Apply given criteria to eloquent builder.
+     *
+     * @param array $criteria
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\Relation|\Illuminate\Database\Eloquent\Builder
+     */
+    protected function applyCriteria(array $criteria)
+    {
+        $query = $this->model->newQuery();
+
+        foreach ($criteria as $criterion) {
+            if (is_array($criterion[1])) {
+                $query->whereIn(...$criterion);
+            } else {
+                $query->where(...$criterion);
+            }
+        }
+
+        return $query;
+    }
+
+    /**
+     * Find many models with given relations.
+     *
+     * @param array $relations
+     *
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function findAllByWith(array $relations) : \Illuminate\Database\Eloquent\Collection
+    {
+        $query = $this->model->newQuery();
+        $query->with($relations);
+
+        return $query->get();
+    }
 }

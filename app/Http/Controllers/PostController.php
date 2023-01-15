@@ -21,9 +21,17 @@ class PostController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function index() : JsonResponse
+    public function index(Request $request) : JsonResponse
     {
-        return new JsonResponse($this->postRepository->findAll(), JsonResponse::HTTP_OK);
+        return new JsonResponse(
+            $this->postRepository->findManyBy(
+                [
+                    [
+                        'course_id',
+                        $request->user()->getCoursesIds()->toArray()
+                    ]
+                ]
+            ), JsonResponse::HTTP_OK);
     }
 
     /**
@@ -49,20 +57,22 @@ class PostController extends Controller
     public function store(Request $request) : JsonResponse
     {
         $this->validate($request, [
-            'title'   => ['required', 'string', 'min:3', 'max:100'],
-            'content' => ['string', 'min:3', 'max:3000'],
-            'media'   => ['mimes:jpg,jpeg,png,gif,mp4,mov,ogg'],
+            'title'    => ['required', 'string', 'min:3', 'max:100'],
+            'content'  => ['string', 'min:3', 'max:3000'],
+            'media'    => ['mimes:jpg,jpeg,png,gif,mp4,mov,ogg'],
+            'courseId' => ['required', 'integer'],
         ]);
+
         $file = $request->file('media');
-        $filename = $file->store('/','post');
+        $filename = $file->store('/', 'post');
 
         $post = new Post();
         $post->title = $request->get('title');
         $post->content = $request->get('content');
         $post->media = $filename;
-        $post->user_role = $this->user['role'];
-        $post->user_id = $this->user['id'];
-        $post->course_id = $this->user['course']['id'];
+        $post->user_role = $request->user()->getRole();
+        $post->user_id = $request->user()->getId();
+        $post->course_id = $request->get('courseId');
         $post->save();
 
         return new JsonResponse($post, JsonResponse::HTTP_CREATED);

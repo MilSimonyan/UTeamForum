@@ -98,7 +98,7 @@ class SsoProvider extends EloquentUserProvider
             $user = new User();
 
             return $user->fromStdClass($response);
-        } catch (Exception $ex) {
+        } catch (Exception $e) {
             return null;
         }
     }

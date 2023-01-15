@@ -18,11 +18,11 @@ Route::middleware('auth:sso')->controller(PostController::class)
     ->prefix('/post')
     ->group(function () {
         Route::GET('/', 'index');
-        Route::POST('/', 'store');
-        Route::GET('/{id}', 'show');
-        Route::DELETE('/{id}', 'destroy');
+        Route::POST('/', 'store')->middleware( 'can:store_post');
+        Route::GET('/{id}', 'show')->middleware( 'can:show_post');
+        Route::DELETE('/{id}', 'destroy')->middleware('can:destroy_post');
     });
 
-Route::middleware('auth:sso')->get('/user', function (){
+Route::middleware('auth:sso')->get('/user', function () {
     return new \Illuminate\Http\JsonResponse(\Illuminate\Support\Facades\Auth::user());
 });

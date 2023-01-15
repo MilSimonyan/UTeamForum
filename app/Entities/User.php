@@ -71,7 +71,7 @@ class User implements Jsonable, JsonSerializable, Authenticatable
     /**
      * @return int
      */
-    public function getId(): int
+    public function getId() : int
     {
         return $this->id;
     }
@@ -79,7 +79,7 @@ class User implements Jsonable, JsonSerializable, Authenticatable
     /**
      * @param int $id
      */
-    public function setId(int $id): void
+    public function setId(int $id) : void
     {
         $this->id = $id;
     }
@@ -87,7 +87,7 @@ class User implements Jsonable, JsonSerializable, Authenticatable
     /**
      * @return string
      */
-    public function getFirstName(): string
+    public function getFirstName() : string
     {
         return $this->firstName;
     }
@@ -95,7 +95,7 @@ class User implements Jsonable, JsonSerializable, Authenticatable
     /**
      * @param string $firstName
      */
-    public function setFirstName(string $firstName): void
+    public function setFirstName(string $firstName) : void
     {
         $this->firstName = $firstName;
     }
@@ -103,7 +103,7 @@ class User implements Jsonable, JsonSerializable, Authenticatable
     /**
      * @return string
      */
-    public function getLastName(): string
+    public function getLastName() : string
     {
         return $this->lastName;
     }
@@ -111,7 +111,7 @@ class User implements Jsonable, JsonSerializable, Authenticatable
     /**
      * @param string $lastName
      */
-    public function setLastName(string $lastName): void
+    public function setLastName(string $lastName) : void
     {
         $this->lastName = $lastName;
     }
@@ -119,7 +119,7 @@ class User implements Jsonable, JsonSerializable, Authenticatable
     /**
      * @return string
      */
-    public function getPatronymic(): string
+    public function getPatronymic() : string
     {
         return $this->patronymic;
     }
@@ -127,7 +127,7 @@ class User implements Jsonable, JsonSerializable, Authenticatable
     /**
      * @param string $patronymic
      */
-    public function setPatronymic(string $patronymic): void
+    public function setPatronymic(string $patronymic) : void
     {
         $this->patronymic = $patronymic;
     }
@@ -135,15 +135,15 @@ class User implements Jsonable, JsonSerializable, Authenticatable
     /**
      * @return string|null
      */
-    public function getBirthDate(): string|null
+    public function getBirthDate() : string|null
     {
         return $this->birthDate;
     }
 
     /**
-     * @param string $birthDate
+     * @param string|null $birthDate
      */
-    public function setBirthDate(string $birthDate): void
+    public function setBirthDate(string|null $birthDate) : void
     {
         $this->birthDate = $birthDate;
     }
@@ -151,7 +151,7 @@ class User implements Jsonable, JsonSerializable, Authenticatable
     /**
      * @return string
      */
-    public function getEmail(): string
+    public function getEmail() : string
     {
         return $this->email;
     }
@@ -159,7 +159,7 @@ class User implements Jsonable, JsonSerializable, Authenticatable
     /**
      * @param string $email
      */
-    public function setEmail(string $email): void
+    public function setEmail(string $email) : void
     {
         $this->email = $email;
     }
@@ -167,7 +167,7 @@ class User implements Jsonable, JsonSerializable, Authenticatable
     /**
      * @return string
      */
-    public function getRole(): string
+    public function getRole() : string
     {
         return $this->role;
     }
@@ -175,23 +175,23 @@ class User implements Jsonable, JsonSerializable, Authenticatable
     /**
      * @param string $role
      */
-    public function setRole(string $role): void
+    public function setRole(string $role) : void
     {
-        $this->role = $role;
+        $this->role = $role ?? null;
     }
 
     /**
      * @return string|null
      */
-    public function getPosition(): string|null
+    public function getPosition() : string|null
     {
         return $this->position;
     }
 
     /**
-     * @param string $position
+     * @param string|null $position
      */
-    public function setPosition(string $position): void
+    public function setPosition(string|null $position) : void
     {
         $this->position = $position;
     }
@@ -199,15 +199,25 @@ class User implements Jsonable, JsonSerializable, Authenticatable
     /**
      * @return \Illuminate\Support\Collection
      */
-    public function getCourses(): Collection
+    public function getCourses() : Collection
     {
         return $this->courses;
     }
 
     /**
+     * @return \Illuminate\Support\Collection
+     */
+    public function getCoursesIds() : Collection
+    {
+        return $this->getCourses()->only('id')->isEmpty() ?
+            $this->getCourses()->pluck('id') :
+            $this->getCourses()->only('id');
+    }
+
+    /**
      * @param Collection|null $courses
      */
-    public function setCourses(Collection $courses = null): void
+    public function setCourses(Collection $courses = null) : void
     {
         try {
             $this->courses = $this->toCollection(
@@ -219,6 +229,7 @@ class User implements Jsonable, JsonSerializable, Authenticatable
                     )
                 ) ?? $courses
             );
+
         } catch (\Exception $e) {
             $this->courses = null;
         }
@@ -228,7 +239,7 @@ class User implements Jsonable, JsonSerializable, Authenticatable
     /**
      * @return \Illuminate\Support\Collection
      */
-    public function getDepartments(): Collection
+    public function getDepartments() : Collection
     {
         return $this->departments;
     }
@@ -236,7 +247,7 @@ class User implements Jsonable, JsonSerializable, Authenticatable
     /**
      * @param Collection|null $departments
      */
-    public function setDepartments(Collection $departments = null): void
+    public function setDepartments(Collection $departments = null) : void
     {
         try {
             $this->departments = $this->toCollection(
@@ -258,7 +269,7 @@ class User implements Jsonable, JsonSerializable, Authenticatable
      *
      * @return string
      */
-    public function getAuthIdentifierName(): string
+    public function getAuthIdentifierName() : string
     {
         return 'id';
     }
@@ -268,7 +279,7 @@ class User implements Jsonable, JsonSerializable, Authenticatable
      *
      * @return int
      */
-    public function getAuthIdentifier(): int
+    public function getAuthIdentifier() : int
     {
         return $this->id;
     }
@@ -278,7 +289,7 @@ class User implements Jsonable, JsonSerializable, Authenticatable
      *
      * @return string
      */
-    public function getAuthPassword(): string
+    public function getAuthPassword() : string
     {
         throw new RuntimeException('Method is not relevant for our authentication mechanism');
     }
@@ -288,7 +299,7 @@ class User implements Jsonable, JsonSerializable, Authenticatable
      *
      * @return string
      */
-    public function getRememberToken(): string
+    public function getRememberToken() : string
     {
         throw new RuntimeException('Method is not relevant for our authentication mechanism');
     }
@@ -300,7 +311,7 @@ class User implements Jsonable, JsonSerializable, Authenticatable
      *
      * @return void
      */
-    public function setRememberToken($value): void
+    public function setRememberToken($value) : void
     {
         throw new RuntimeException('Method is not relevant for our authentication mechanism');
     }
@@ -310,7 +321,7 @@ class User implements Jsonable, JsonSerializable, Authenticatable
      *
      * @return string
      */
-    public function getRememberTokenName(): string
+    public function getRememberTokenName() : string
     {
         throw new RuntimeException('Method is not relevant for our authentication mechanism');
     }
@@ -318,18 +329,18 @@ class User implements Jsonable, JsonSerializable, Authenticatable
     /**
      * @return array
      */
-    public function jsonSerialize(): array
+    public function jsonSerialize() : array
     {
         return [
-            'id' => $this->getId(),
-            'firstName' => $this->getFirstName(),
-            'lastName' => $this->getLastName(),
-            'email' => $this->getEmail(),
-            'patronymic' => $this->getPatronymic(),
-            'birthDate' => $this->getBirthDate(),
-            'role' => $this->getRole(),
-            'position' => $this->getPosition(),
-            'courses' => $this->getCourses(),
+            'id'          => $this->getId(),
+            'firstName'   => $this->getFirstName(),
+            'lastName'    => $this->getLastName(),
+            'email'       => $this->getEmail(),
+            'patronymic'  => $this->getPatronymic(),
+            'birthDate'   => $this->getBirthDate(),
+            'role'        => $this->getRole(),
+            'position'    => $this->getPosition(),
+            'courses'     => $this->getCourses(),
             'departments' => $this->getDepartments()
         ];
     }
@@ -339,27 +350,27 @@ class User implements Jsonable, JsonSerializable, Authenticatable
      *
      * @return false|string
      */
-    public function toJson($options = 0): false|string
+    public function toJson($options = 0) : false|string
     {
         return json_encode($this->jsonSerialize(), $options);
     }
 
     /**
-     * @param stdClass $stdClass
+     * @param stdClass $userData
+     *
      * @return Authenticatable
      *
-     * @throws \Exception
      */
-    public function fromStdClass(stdClass $stdClass): Authenticatable
+    public function fromStdClass(stdClass $userData) : Authenticatable
     {
-        $this->id = $stdClass->id;
-        $this->firstName = $stdClass->firstName;
-        $this->lastName = $stdClass->lastName;
-        $this->email = $stdClass->email;
-        $this->patronymic = $stdClass->patronymic;
-        $this->birthDate = $stdClass->birthDate ?? null;
-        $this->role = $stdClass->role ?? null;
-        $this->position = $stdClass->position ?? null;
+        $this->setId($userData->id);
+        $this->setFirstName($userData->firstName);
+        $this->setLastName($userData->lastName);
+        $this->setEmail($userData->email);
+        $this->setPatronymic($userData->patronymic);
+        $this->setBirthDate($userData->birthDate ?? null);
+        $this->setRole($userData->role);
+        $this->setPosition($userData->position ?? null);
         $this->setCourses();
         $this->setDepartments();
 
@@ -371,7 +382,7 @@ class User implements Jsonable, JsonSerializable, Authenticatable
      *
      * @return Collection
      */
-    private function toCollection($data): Collection
+    private function toCollection($data) : Collection
     {
         return collect(json_decode(json_encode($data), true));
     }
