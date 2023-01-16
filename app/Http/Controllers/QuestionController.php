@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Post;
-use App\Repositories\PostRepository;
+use App\Models\Question;
+use App\Repositories\QuestionRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-class PostController extends Controller
+class QuestionController extends Controller
 {
-    protected PostRepository $postRepository;
+    protected QuestionRepository $questionRepository;
 
-    public function __construct(PostRepository $postRepository)
+    public function __construct(QuestionRepository $questionRepository)
     {
-        $this->postRepository = $postRepository;
+        $this->questionRepository = $questionRepository;
     }
 
     /**
@@ -26,7 +26,7 @@ class PostController extends Controller
     public function index(Request $request) : JsonResponse
     {
         return new JsonResponse(
-            $this->postRepository->findManyBy(
+            $this->questionRepository->findManyBy(
                 [
                     [
                         'course_id',
@@ -45,7 +45,7 @@ class PostController extends Controller
      */
     public function show(int $id) : JsonResponse
     {
-        return new JsonResponse($this->postRepository->find($id), JsonResponse::HTTP_OK);
+        return new JsonResponse($this->questionRepository->find($id), JsonResponse::HTTP_OK);
     }
 
     /**
@@ -66,18 +66,18 @@ class PostController extends Controller
         ]);
 
         $file = $request->file('media');
-        $filename = $file->store('/', 'post');
+        $filename = $file->store('/', 'question');
 
-        $post = new Post();
-        $post->title = $request->get('title');
-        $post->content = $request->get('content');
-        $post->media = $filename;
-        $post->user_role = $request->user()->getRole();
-        $post->user_id = $request->user()->getId();
-        $post->course_id = $request->get('courseId');
-        $post->save();
+        $question = new Question();
+        $question->title = $request->get('title');
+        $question->content = $request->get('content');
+        $question->media = $filename;
+        $question->user_role = $request->user()->getRole();
+        $question->user_id = $request->user()->getId();
+        $question->course_id = $request->get('courseId');
+        $question->save();
 
-        return new JsonResponse($post, JsonResponse::HTTP_CREATED);
+        return new JsonResponse($question, JsonResponse::HTTP_CREATED);
     }
 
     /**
@@ -89,7 +89,7 @@ class PostController extends Controller
      */
     public function destroy(int $id) : JsonResponse
     {
-        $course = $this->postRepository->find($id);
+        $course = $this->questionRepository->find($id);
         $course->delete();
 
         return new JsonResponse('deleted', JsonResponse::HTTP_NO_CONTENT);

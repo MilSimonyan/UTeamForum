@@ -47,7 +47,7 @@ class HttpService
 
             return json_decode($response->getBody());
         } catch (Exception $e) {
-            return null;
+            throw new Exception();
         }
     }
 }
