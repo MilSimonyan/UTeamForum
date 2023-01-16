@@ -3,10 +3,9 @@
 namespace App\Providers;
 
 use App\Gates\PostGate;
-use App\Models\Post;
+use App\Gates\QuestionGate;
 use App\Services\Auth\SsoGuard;
 use App\Services\Auth\SsoProvider;
-use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Auth;
@@ -32,11 +31,11 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        Auth::provider('sso', function (Application $app, array $config) {
+        Auth::provider('sso', function (Application $app) {
             return new SsoProvider($app['hash']);
         });
 
-        Auth::extend('sso', function (Application $app, $name, array $config) {
+        Auth::extend('sso', function (Application $app, $name) {
             return new SsoGuard(
                 $name,
                 $this->app->get(SsoProvider::class),
@@ -47,5 +46,9 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('show_post', [PostGate::class, 'showPost']);
         Gate::define('store_post', [PostGate::class, 'storePost']);
         Gate::define('destroy_post', [PostGate::class, 'destroyPost']);
+
+        Gate::define('show_question', [QuestionGate::class, 'showQuestion']);
+        Gate::define('store_question', [QuestionGate::class, 'storeQuestion']);
+        Gate::define('destroy_question', [QuestionGate::class, 'destroyQuestion']);
     }
 }

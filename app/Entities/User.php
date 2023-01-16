@@ -197,9 +197,9 @@ class User implements Jsonable, JsonSerializable, Authenticatable
     }
 
     /**
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection|null
      */
-    public function getCourses() : Collection
+    public function getCourses() : ?Collection
     {
         return $this->courses;
     }
@@ -237,9 +237,9 @@ class User implements Jsonable, JsonSerializable, Authenticatable
     }
 
     /**
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection|null
      */
-    public function getDepartments() : Collection
+    public function getDepartments() : ?Collection
     {
         return $this->departments;
     }

@@ -10,12 +10,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- * @property mixed $title
- * @property mixed $content
- * @property mixed $media
- * @property mixed $user_role
- * @property mixed $user_id
- * @property mixed $course_id
+ * @property string $title
+ * @property string $content
+ * @property string $media
+ * @property string $user_role
+ * @property int $user_id
+ * @property int $course_id
  */
 class Post extends Model
 {

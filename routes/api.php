@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\QuestionController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -23,7 +24,7 @@ Route::middleware('auth:sso')->controller(PostController::class)
         Route::DELETE('/{id}', 'destroy')->middleware('can:destroy_post');
     });
 
-Route::middleware('auth:sso')->controller(PostController::class)
+Route::middleware('auth:sso')->controller(QuestionController::class)
     ->prefix('/question')
     ->group(function () {
         Route::GET('/', 'index');

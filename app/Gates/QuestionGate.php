@@ -2,20 +2,20 @@
 
 namespace App\Gates;
 
-use App\Models\Post;
+use App\Models\Question;
 use Illuminate\Contracts\Auth\Authenticatable;
 
-class PostGate
+class QuestionGate
 {
     /**
      * @param \Illuminate\Contracts\Auth\Authenticatable $user
      *
      * @return bool
      */
-    public function showPost(Authenticatable $user) : bool
+    public function showQuestion(Authenticatable $user) : bool
     {
         try {
-            return !$user->getCoursesIds()->intersect(Post::find(app()->request->id)->courseId)->isEmpty();
+            return !$user->getCoursesIds()->intersect(Question::find(app()->request->id)->courseId)->isEmpty();
         } catch (\Exception) {
             return false;
         }
@@ -26,7 +26,7 @@ class PostGate
      *
      * @return bool
      */
-    public function storePost(Authenticatable $user) : bool
+    public function storeQuestion(Authenticatable $user) : bool
     {
         try {
             return !$user->getCoursesIds()->intersect(app()->request->get('courseId'))->isEmpty();
@@ -40,10 +40,10 @@ class PostGate
      *
      * @return bool
      */
-    public function destroyPost(Authenticatable $user) : bool
+    public function destroyQuestion(Authenticatable $user) : bool
     {
         try {
-            return !Post::where('id', app()->request->id)
+            return !Question::where('id', app()->request->id)
                 ->where('user_id', $user->getId())
                 ->where('user_role', $user->getRole())
                 ->get()->isEmpty();
