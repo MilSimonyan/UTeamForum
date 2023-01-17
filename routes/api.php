@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\QuestionController;
+use App\Http\Controllers\TagController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -33,6 +34,17 @@ Route::middleware('auth:sso')->controller(QuestionController::class)
         Route::PUT('/', 'update')->middleware( 'can:store_post');
         Route::GET('/{id}', 'show')->middleware( 'can:show_question');
         Route::DELETE('/{id}', 'destroy')->middleware('can:destroy_question');
+    });
+
+
+Route::middleware('auth:sso')->controller(TagController::class)
+    ->prefix('/tag')
+    ->group(function () {
+        Route::GET('/', 'index');
+        Route::GET('//{id}', 'show');
+        Route::POST('/', 'store');
+        Route::PATCH('/{id}', 'update');
+        Route::DELETE('/{id}', 'destroy');
     });
 
 Route::middleware('auth:sso')->get('/user', function () {
