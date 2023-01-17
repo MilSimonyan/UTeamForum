@@ -14,8 +14,7 @@ return [
     */
 
     'defaults' => [
-        'guard' => 'web',
-        'passwords' => 'users',
+        'guard' => 'sso',
     ],
 
     /*
@@ -36,9 +35,9 @@ return [
     */
 
     'guards' => [
-        'web' => [
-            'driver' => 'session',
-            'provider' => 'users',
+        'sso' => [
+            'driver' => 'sso',
+            'provider' => 'sso',
         ],
     ],
 

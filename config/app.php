@@ -209,7 +209,7 @@ return [
     */
 
     'aliases' => Facade::defaultAliases()->merge([
-        // 'ExampleClass' => App\Example\ExampleClass::class,
+        'http_caller' => \App\Services\HttpService\HttpService::class
     ])->toArray(),
 
 ];

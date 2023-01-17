@@ -30,6 +30,18 @@ return [
 
     'disks' => [
 
+        'post' => [
+            'driver' => 'local',
+            'root' => storage_path('app/media/post'),
+            'throw' => false,
+        ],
+
+        'question' => [
+            'driver' => 'local',
+            'root' => storage_path('app/media/question'),
+            'throw' => false,
+        ],
+
         'local' => [
             'driver' => 'local',
             'root' => storage_path('app'),
