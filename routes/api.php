@@ -34,14 +34,15 @@ Route::middleware('auth:sso')->controller(QuestionController::class)
         Route::DELETE('/{id}', 'destroy')->middleware('can:destroy_question');
     });
 
-Route::controller(TagController::class)
+
+Route::middleware('auth:sso')->controller(TagController::class)
     ->prefix('/tag')
     ->group(function () {
-        Route::get('/get', 'index');
-        Route::get('/get/{id}', 'show');
-        Route::post('/create', 'store');
-        Route::patch('/edit/{id}', 'update');
-        Route::delete('/delete/{id}', 'destroy');
+        Route::GET('/', 'index');
+        Route::GET('//{id}', 'show');
+        Route::POST('/', 'store');
+        Route::PATCH('/{id}', 'update');
+        Route::DELETE('/{id}', 'destroy');
     });
 
 Route::middleware('auth:sso')->get('/user', function () {
