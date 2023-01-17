@@ -20,6 +20,7 @@ Route::middleware('auth:sso')->controller(PostController::class)
     ->group(function () {
         Route::GET('/', 'index');
         Route::POST('/', 'store')->middleware( 'can:store_post');
+        Route::PUT('/', 'update')->middleware( 'can:store_post');
         Route::GET('/{id}', 'show')->middleware( 'can:show_post');
         Route::DELETE('/{id}', 'destroy')->middleware('can:destroy_post');
     });
@@ -29,6 +30,7 @@ Route::middleware('auth:sso')->controller(QuestionController::class)
     ->group(function () {
         Route::GET('/', 'index');
         Route::POST('/', 'store')->middleware( 'can:store_question');
+        Route::PUT('/', 'update')->middleware( 'can:store_post');
         Route::GET('/{id}', 'show')->middleware( 'can:show_question');
         Route::DELETE('/{id}', 'destroy')->middleware('can:destroy_question');
     });

@@ -11,7 +11,8 @@ class TagController extends Controller
 {
     protected TagRepository $tagRepository;
 
-    public function __construct(TagRepository $tagRepository){
+    public function __construct(TagRepository $tagRepository)
+    {
         $this->tagRepository = $tagRepository;
     }
 
@@ -28,13 +29,15 @@ class TagController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
+     *
      * @return \Illuminate\Http\JsonResponse
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function store(Request $request) : JsonResponse
     {
         $this->validate($request, [
-           'name' => ['required', 'string','min:2','max:30', 'unique:tags,name']
+            'name' => ['required', 'string', 'min:2', 'max:30', 'unique:tags,name']
         ]);
 
         $tag = new Tag();
@@ -47,8 +50,9 @@ class TagController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param int $id
+     *
+     * @return \Illuminate\Http\JsonResponse
      */
     public function show(int $id) : JsonResponse
     {
@@ -58,15 +62,16 @@ class TagController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param \Illuminate\Http\Request $request
+     * @param int                      $id
      *
      * @return \Illuminate\Http\JsonResponse
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function update(Request $request, int $id) : JsonResponse
     {
         $this->validate($request, [
-            'name' => ['string','min:2','max:30', 'unique:tags,name']
+            'name' => ['string', 'min:2', 'max:30', 'unique:tags,name']
         ]);
 
         $tag = $this->tagRepository->find($id);
@@ -79,15 +84,15 @@ class TagController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param int $id
      *
      * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(int $id) : JsonResponse
     {
-        $tag = $this->tagRepository->find($id,);
+        $tag = $this->tagRepository->find($id);
         $tag->delete();
 
-        return new JsonResponse(null,  JsonResponse::HTTP_NO_CONTENT);
+        return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
     }
 }

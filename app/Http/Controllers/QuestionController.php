@@ -62,6 +62,7 @@ class QuestionController extends Controller
             'title'    => ['required', 'string', 'min:3', 'max:100'],
             'content'  => ['string', 'min:3', 'max:3000'],
             'media'    => ['mimes:jpg,jpeg,png,gif,mp4,mov,ogg'],
+            'tags'     => ['array', 'exists:tags,id'],
             'courseId' => ['required', 'integer'],
         ]);
 

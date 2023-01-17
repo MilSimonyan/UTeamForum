@@ -95,6 +95,12 @@ class SsoProvider extends EloquentUserProvider
     {
         try {
             $response = HttpCaller::get('http://account.u-team.com/user');
+
+            if ($response->role == 'admin')
+            {
+                return null;
+            }
+
             $user = new User();
 
             return $user->fromStdClass($response);
