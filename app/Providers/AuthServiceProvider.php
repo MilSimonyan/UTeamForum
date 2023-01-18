@@ -46,6 +46,7 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('show_post', [PostGate::class, 'showPost']);
         Gate::define('like_post', [PostGate::class, 'likePost']);
         Gate::define('store_post', [PostGate::class, 'storePost']);
+        Gate::define('update_post', [PostGate::class, 'updatePost']);
         Gate::define('destroy_post', [PostGate::class, 'destroyPost']);
 
         Gate::define('show_question', [QuestionGate::class, 'showQuestion']);

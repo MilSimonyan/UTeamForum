@@ -46,7 +46,7 @@ class QuestionGate
             $question = Question::find(app()->request->id);
 
             return !$user->getCoursesIds()->intersect($question->courseId)->isEmpty() &&
-                $question->created_at->gt(now()->subMinutes(15));
+                $question->created_at->gt(now()->subMinutes(5));
         } catch (\Exception) {
             return false;
         }

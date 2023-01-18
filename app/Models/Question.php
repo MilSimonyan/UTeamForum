@@ -49,6 +49,7 @@ class Question extends Model
 
     protected $with = [
         'tags',
+        'comments'
     ];
 
     /**

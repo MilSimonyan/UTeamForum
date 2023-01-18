@@ -59,7 +59,7 @@ class PostController extends Controller
     {
         $this->validate($request, [
             'title'    => ['required', 'string', 'min:3', 'max:100'],
-            'content'  => ['string', 'min:3', 'max:3000'],
+            'content'  => ['required', 'string', 'min:3', 'max:3000'],
             'media'    => ['mimes:jpg,jpeg,png,gif,mp4,mov,ogg'],
             'tags'     => ['array', 'exists:tags,id'],
             'courseId' => ['required', 'integer'],
@@ -77,6 +77,38 @@ class PostController extends Controller
         $post->course_id = $request->get('courseId');
         $post->save();
         $post->tags()->sync($request->get('tags'));
+        $post->refresh()->load('tags');
+
+        return new JsonResponse($post, JsonResponse::HTTP_CREATED);
+    }
+
+
+    /**
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function update(Request $request, int $id) : JsonResponse
+    {
+        $this->validate($request, [
+            'title'   => ['string', 'min:3', 'max:100'],
+            'content' => ['string', 'min:3', 'max:3000'],
+            'media'   => ['mimes:jpg,jpeg,png,gif,mp4,mov,ogg'],
+            'tags'    => ['array', 'exists:tags,id'],
+        ]);
+
+        if ($file = $request->file('media')) {
+            $filename = $file->store('/', 'question');
+        }
+
+        /** @var Post $post */
+        $post = $this->postRepository->find($id);
+        $post->title = $request->get('title', $post->title);
+        $post->content = $request->get('content', $post->content);
+        $post->media = $filename ?? null;
+        $post->user_role = $request->user()->getRole();
+        $post->user_id = $request->user()->getId();
+        $post->course_id = $request->get('courseId', $post->course_id);
+        $post->save();
+        $post->tags()->sync($request->get('tags', $post->tags()->get()));
         $post->refresh()->load('tags');
 
         return new JsonResponse($post, JsonResponse::HTTP_CREATED);

@@ -78,7 +78,7 @@ class QuestionController extends Controller
         $question->course_id = $request->get('courseId');
         $question->save();
         $question->tags()->sync($request->get('tags'));
-        $question->refresh()->load('tags');
+        $question->refresh()->load('tags','comments');
 
         return new JsonResponse($question, JsonResponse::HTTP_CREATED);
     }
@@ -86,7 +86,7 @@ class QuestionController extends Controller
     /**
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function update(Request $request, int $id)
+    public function update(Request $request, int $id) : JsonResponse
     {
         $this->validate($request, [
             'title'   => ['string', 'min:3', 'max:100'],
@@ -109,7 +109,7 @@ class QuestionController extends Controller
         $question->course_id = $request->get('courseId', $question->course_id);
         $question->save();
         $question->tags()->sync($request->get('tags', $question->tags()->get()));
-        $question->refresh()->load('tags');
+        $question->refresh()->load('tags','comments');
 
         return new JsonResponse($question, JsonResponse::HTTP_CREATED);
     }

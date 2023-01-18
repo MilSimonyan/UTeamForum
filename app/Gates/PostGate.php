@@ -35,6 +35,21 @@ class PostGate
         }
     }
 
+
+    /**
+     * @param \Illuminate\Contracts\Auth\Authenticatable $user
+     *
+     * @return bool
+     */
+    public function updatePost(Authenticatable $user) : bool
+    {
+        try {
+            return !$user->getCoursesIds()->intersect(Post::find(app()->request->id)->courseId)->isEmpty();
+        } catch (\Exception) {
+            return false;
+        }
+    }
+
     /**
      * @param \Illuminate\Contracts\Auth\Authenticatable $user
      *

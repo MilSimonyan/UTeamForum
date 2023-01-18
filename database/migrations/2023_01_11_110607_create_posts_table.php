@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->string('content');
-            $table->string('media')->nullable();
+            $table->string('media')->default(null);
             $table->enum('user_role', [
                 'teacher',
                 'student',
