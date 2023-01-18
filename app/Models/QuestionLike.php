@@ -7,7 +7,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class QuestionRate extends Model
+/**
+ * @property integer $questionId
+ * @property integer $user_role
+ * @property integer $user_id
+ */
+class QuestionLike extends Model
 {
     use HasFactory;
     use AttributesModifier;
@@ -21,7 +26,7 @@ class QuestionRate extends Model
      * @var string[]
      */
     protected $fillable = [
-     'like',
+        'like',
     ];
 
     /**

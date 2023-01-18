@@ -26,6 +26,20 @@ class PostGate
      *
      * @return bool
      */
+    public function likePost(Authenticatable $user) : bool
+    {
+        try {
+            return !$user->getCoursesIds()->intersect(Post::find(app()->request->postId)->courseId)->isEmpty();
+        } catch (\Exception) {
+            return false;
+        }
+    }
+
+    /**
+     * @param \Illuminate\Contracts\Auth\Authenticatable $user
+     *
+     * @return bool
+     */
     public function storePost(Authenticatable $user) : bool
     {
         try {

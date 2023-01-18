@@ -77,6 +77,39 @@ class QuestionController extends Controller
         $question->user_id = $request->user()->getId();
         $question->course_id = $request->get('courseId');
         $question->save();
+        $question->tags()->sync($request->get('tags'));
+        $question->refresh()->load('tags');
+
+        return new JsonResponse($question, JsonResponse::HTTP_CREATED);
+    }
+
+    /**
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function update(Request $request, int $id)
+    {
+        $this->validate($request, [
+            'title'   => ['string', 'min:3', 'max:100'],
+            'content' => ['string', 'min:3', 'max:3000'],
+            'media'   => ['mimes:jpg,jpeg,png,gif,mp4,mov,ogg'],
+            'tags'    => ['array', 'exists:tags,id'],
+        ]);
+
+        if ($file = $request->file('media')) {
+            $filename = $file->store('/', 'question');
+        }
+
+        /** @var Question $question */
+        $question = $this->questionRepository->find($id);
+        $question->title = $request->get('title', $question->title);
+        $question->content = $request->get('content', $question->content);
+        $question->media = $filename ?? null;
+        $question->user_role = $request->user()->getRole();
+        $question->user_id = $request->user()->getId();
+        $question->course_id = $request->get('courseId', $question->course_id);
+        $question->save();
+        $question->tags()->sync($request->get('tags', $question->tags()->get()));
+        $question->refresh()->load('tags');
 
         return new JsonResponse($question, JsonResponse::HTTP_CREATED);
     }

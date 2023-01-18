@@ -44,11 +44,14 @@ class AuthServiceProvider extends ServiceProvider
         });
 
         Gate::define('show_post', [PostGate::class, 'showPost']);
+        Gate::define('like_post', [PostGate::class, 'likePost']);
         Gate::define('store_post', [PostGate::class, 'storePost']);
         Gate::define('destroy_post', [PostGate::class, 'destroyPost']);
 
         Gate::define('show_question', [QuestionGate::class, 'showQuestion']);
+        Gate::define('like_question', [QuestionGate::class, 'likeQuestion']);
         Gate::define('store_question', [QuestionGate::class, 'storeQuestion']);
+        Gate::define('update_question', [QuestionGate::class, 'updateQuestion']);
         Gate::define('destroy_question', [QuestionGate::class, 'destroyQuestion']);
     }
 }

@@ -13,9 +13,8 @@ return new class extends Migration
      */
     public function up() : void
     {
-        Schema::create('post_rates', function (Blueprint $table) {
+        Schema::create('post_likes', function (Blueprint $table) {
             $table->id();
-            $table->integer('like');
             $table->enum('user_role', [
                 'teacher',
                 'student',

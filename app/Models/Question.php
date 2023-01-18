@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * @property string $title
@@ -38,6 +39,18 @@ class Question extends Model
         'media',
     ];
 
+    protected $appends = [
+        'likedByMe'
+    ];
+
+    protected $withCount = [
+        'likes'
+    ];
+
+    protected $with = [
+        'tags',
+    ];
+
     /**
      * @return HasMany
      */
@@ -49,9 +62,9 @@ class Question extends Model
     /**
      * @return HasMany
      */
-    public function rates() : HasMany
+    public function likes() : HasMany
     {
-        return $this->hasMany(QuestionRate::class);
+        return $this->hasMany(QuestionLike::class);
     }
 
     /**
@@ -71,5 +84,17 @@ class Question extends Model
         return Attribute::make(
             get: fn($value) => $path . $value,
         );
+    }
+
+    /**
+     * @return bool
+     */
+    protected function getLikedByMeAttribute() : bool
+    {
+        return $this
+            ->likes()
+            ->where('user_id', Auth::user()->getId())
+            ->where('user_role', Auth::user()->getRole())
+            ->exists();
     }
 }

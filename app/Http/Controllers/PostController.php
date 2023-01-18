@@ -25,15 +25,14 @@ class PostController extends Controller
      */
     public function index(Request $request) : JsonResponse
     {
-        return new JsonResponse(
-            $this->postRepository->findManyBy(
+        return new JsonResponse($this->postRepository->findManyBy(
+            [
                 [
-                    [
-                        'course_id',
-                        $request->user()->getCoursesIds()->toArray()
-                    ]
+                    'course_id',
+                    $request->user()->getCoursesIds()->toArray()
                 ]
-            ), JsonResponse::HTTP_OK);
+            ]
+        ), JsonResponse::HTTP_OK);
     }
 
     /**
@@ -76,8 +75,9 @@ class PostController extends Controller
         $post->user_role = $request->user()->getRole();
         $post->user_id = $request->user()->getId();
         $post->course_id = $request->get('courseId');
-        $post->tags()->sync($request->get('tags'));
         $post->save();
+        $post->tags()->sync($request->get('tags'));
+        $post->refresh()->load('tags');
 
         return new JsonResponse($post, JsonResponse::HTTP_CREATED);
     }

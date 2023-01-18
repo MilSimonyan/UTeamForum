@@ -26,6 +26,37 @@ class QuestionGate
      *
      * @return bool
      */
+    public function likeQuestion(Authenticatable $user) : bool
+    {
+        try {
+            return !$user->getCoursesIds()->intersect(Question::find(app()->request->questionId)->courseId)->isEmpty();
+        } catch (\Exception) {
+            return false;
+        }
+    }
+
+    /**
+     * @param \Illuminate\Contracts\Auth\Authenticatable $user
+     *
+     * @return bool
+     */
+    public function updateQuestion(Authenticatable $user) : bool
+    {
+        try {
+            $question = Question::find(app()->request->id);
+
+            return !$user->getCoursesIds()->intersect($question->courseId)->isEmpty() &&
+                $question->created_at->gt(now()->subMinutes(15));
+        } catch (\Exception) {
+            return false;
+        }
+    }
+
+    /**
+     * @param \Illuminate\Contracts\Auth\Authenticatable $user
+     *
+     * @return bool
+     */
     public function storeQuestion(Authenticatable $user) : bool
     {
         try {
