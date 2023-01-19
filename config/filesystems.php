@@ -36,6 +36,12 @@ return [
             'throw' => false,
         ],
 
+        'comment' => [
+            'driver' => 'local',
+            'root' => storage_path('app/media/comment'),
+            'throw' => false,
+        ],
+
         'question' => [
             'driver' => 'local',
             'root' => storage_path('app/media/question'),

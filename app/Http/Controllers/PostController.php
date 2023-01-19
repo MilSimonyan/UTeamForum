@@ -6,6 +6,7 @@ use App\Models\Post;
 use App\Repositories\PostRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
@@ -65,13 +66,13 @@ class PostController extends Controller
             'courseId' => ['required', 'integer'],
         ]);
 
-        $file = $request->file('media');
-        $filename = $file->store('/', 'post');
+        if ($file = $request->file('media'))
+            $filename = $file->store('/', 'post');
 
         $post = new Post();
         $post->title = $request->get('title');
         $post->content = $request->get('content');
-        $post->media = $filename;
+        $post->media = $filename ?? null;
         $post->user_role = $request->user()->getRole();
         $post->user_id = $request->user()->getId();
         $post->course_id = $request->get('courseId');
@@ -81,7 +82,6 @@ class PostController extends Controller
 
         return new JsonResponse($post, JsonResponse::HTTP_CREATED);
     }
-
 
     /**
      * @throws \Illuminate\Validation\ValidationException
@@ -95,12 +95,17 @@ class PostController extends Controller
             'tags'    => ['array', 'exists:tags,id'],
         ]);
 
-        if ($file = $request->file('media')) {
-            $filename = $file->store('/', 'question');
-        }
-
         /** @var Post $post */
         $post = $this->postRepository->find($id);
+
+        if ($file = $request->file('media')) {
+            if ($post->media) {
+                Storage::disk('post')->delete($post->media);
+            }
+
+            $filename = $file->store('/', 'post');
+        }
+
         $post->title = $request->get('title', $post->title);
         $post->content = $request->get('content', $post->content);
         $post->media = $filename ?? null;
@@ -123,8 +128,13 @@ class PostController extends Controller
      */
     public function destroy(int $id) : JsonResponse
     {
-        $course = $this->postRepository->find($id);
-        $course->delete();
+        /** @var Post $post */
+        $post = $this->postRepository->find($id);
+
+        if ($post->media)
+            Storage::disk('post')->delete($post->media);
+
+        $post->delete();
 
         return new JsonResponse('deleted', JsonResponse::HTTP_NO_CONTENT);
     }

@@ -3,6 +3,8 @@
 namespace App\Gates;
 
 use App\Models\Question;
+use Error;
+use Exception;
 use Illuminate\Contracts\Auth\Authenticatable;
 
 class QuestionGate
@@ -16,7 +18,7 @@ class QuestionGate
     {
         try {
             return !$user->getCoursesIds()->intersect(Question::find(app()->request->id)->courseId)->isEmpty();
-        } catch (\Exception) {
+        } catch (Exception|Error) {
             return false;
         }
     }
@@ -30,7 +32,7 @@ class QuestionGate
     {
         try {
             return !$user->getCoursesIds()->intersect(Question::find(app()->request->questionId)->courseId)->isEmpty();
-        } catch (\Exception) {
+        } catch (Exception|Error) {
             return false;
         }
     }
@@ -47,7 +49,7 @@ class QuestionGate
 
             return !$user->getCoursesIds()->intersect($question->courseId)->isEmpty() &&
                 $question->created_at->gt(now()->subMinutes(5));
-        } catch (\Exception) {
+        } catch (Exception|Error) {
             return false;
         }
     }
@@ -61,7 +63,7 @@ class QuestionGate
     {
         try {
             return !$user->getCoursesIds()->intersect(app()->request->get('courseId'))->isEmpty();
-        } catch (\Exception) {
+        } catch (Exception|Error) {
             return false;
         }
     }
@@ -78,7 +80,7 @@ class QuestionGate
                 ->where('user_id', $user->getId())
                 ->where('user_role', $user->getRole())
                 ->get()->isEmpty();
-        } catch (\Exception) {
+        } catch (Exception|Error) {
             return false;
         }
     }

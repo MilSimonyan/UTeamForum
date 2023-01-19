@@ -13,18 +13,19 @@ return new class extends Migration
      */
     public function up() : void
     {
-        Schema::create('post_likes', function (Blueprint $table) {
+        Schema::create('comment_rates', function (Blueprint $table) {
             $table->id();
             $table->enum('user_role', [
                 'teacher',
                 'student',
             ]);
+            $table->tinyInteger('value');
             $table->unsignedBigInteger('user_id');
-            $table->unsignedBigInteger('post_id');
-            $table->unique(['user_role', 'user_id', 'post_id']);
-            $table->foreign('post_id')
+            $table->unsignedBigInteger('comment_id');
+            $table->unique(['user_role', 'user_id', 'comment_id']);
+            $table->foreign('comment_id')
                 ->references('id')
-                ->on('posts')
+                ->on('comments')
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
             $table->timestamps();
@@ -38,6 +39,6 @@ return new class extends Migration
      */
     public function down() : void
     {
-        Schema::dropIfExists('post_rates');
+        Schema::dropIfExists('comment_rates');
     }
 };

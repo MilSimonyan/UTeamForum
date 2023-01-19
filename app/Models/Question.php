@@ -20,8 +20,8 @@ use Illuminate\Support\Facades\Auth;
  */
 class Question extends Model
 {
-    use HasFactory;
-    use AttributesModifier;
+    use HasFactory,
+        AttributesModifier;
 
     const QUESTION_MEDIA_STORAGE = 'app/media/question/';
 
@@ -57,7 +57,7 @@ class Question extends Model
      */
     public function comments() : HasMany
     {
-        return $this->hasMany(Comment::class);
+        return $this->hasMany(Comment::class)->where('parent_id',null);
     }
 
     /**

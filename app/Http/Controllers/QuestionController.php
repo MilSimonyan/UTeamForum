@@ -6,6 +6,7 @@ use App\Models\Question;
 use App\Repositories\QuestionRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class QuestionController extends Controller
 {
@@ -60,25 +61,25 @@ class QuestionController extends Controller
     {
         $this->validate($request, [
             'title'    => ['required', 'string', 'min:3', 'max:100'],
-            'content'  => ['string', 'min:3', 'max:3000'],
+            'content'  => ['required', 'string', 'min:3', 'max:3000'],
             'media'    => ['mimes:jpg,jpeg,png,gif,mp4,mov,ogg'],
             'tags'     => ['array', 'exists:tags,id'],
             'courseId' => ['required', 'integer'],
         ]);
 
-        $file = $request->file('media');
-        $filename = $file->store('/', 'question');
+        if ($file = $request->file('media'))
+            $filename = $file->store('/', 'question');
 
         $question = new Question();
         $question->title = $request->get('title');
         $question->content = $request->get('content');
-        $question->media = $filename;
+        $question->media = $filename ?? null;
         $question->user_role = $request->user()->getRole();
         $question->user_id = $request->user()->getId();
         $question->course_id = $request->get('courseId');
         $question->save();
         $question->tags()->sync($request->get('tags'));
-        $question->refresh()->load('tags','comments');
+        $question->refresh()->load('tags', 'comments');
 
         return new JsonResponse($question, JsonResponse::HTTP_CREATED);
     }
@@ -95,21 +96,26 @@ class QuestionController extends Controller
             'tags'    => ['array', 'exists:tags,id'],
         ]);
 
+        /** @var Question $question */
+        $question = $this->questionRepository->find($id);
+
         if ($file = $request->file('media')) {
+            if ($question->media) {
+                Storage::disk('question')->delete($question->media);
+            }
+
             $filename = $file->store('/', 'question');
         }
 
-        /** @var Question $question */
-        $question = $this->questionRepository->find($id);
         $question->title = $request->get('title', $question->title);
         $question->content = $request->get('content', $question->content);
-        $question->media = $filename ?? null;
+        $question->media = $filename ?? $question->media;
         $question->user_role = $request->user()->getRole();
         $question->user_id = $request->user()->getId();
         $question->course_id = $request->get('courseId', $question->course_id);
         $question->save();
         $question->tags()->sync($request->get('tags', $question->tags()->get()));
-        $question->refresh()->load('tags','comments');
+        $question->refresh()->load('tags', 'comments');
 
         return new JsonResponse($question, JsonResponse::HTTP_CREATED);
     }
@@ -123,8 +129,13 @@ class QuestionController extends Controller
      */
     public function destroy(int $id) : JsonResponse
     {
-        $course = $this->questionRepository->find($id);
-        $course->delete();
+        /** @var Question $question */
+        $question = $this->questionRepository->find($id);
+
+        if ($question->media)
+            Storage::disk('question')->delete($question->media);
+
+        $question->delete();
 
         return new JsonResponse('deleted', JsonResponse::HTTP_NO_CONTENT);
     }

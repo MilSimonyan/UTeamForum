@@ -16,13 +16,13 @@ return new class extends Migration
         Schema::create('comments', function (Blueprint $table) {
             $table->id();
             $table->string('content');
-            $table->integer('rate')->default(0);
+            $table->string('media')->default(null)->nullable();
             $table->enum('user_role', [
                 'teacher',
                 'student',
             ]);
             $table->unsignedBigInteger('user_id');
-            $table->unsignedBigInteger('parent_id');
+            $table->unsignedBigInteger('parent_id')->default(null)->nullable();
             $table->unsignedBigInteger('question_id');
             $table->foreign('parent_id')
                 ->references('id')

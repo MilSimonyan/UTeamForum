@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Gates\CommentGate;
 use App\Gates\PostGate;
 use App\Gates\QuestionGate;
 use App\Services\Auth\SsoGuard;
@@ -54,5 +55,11 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('store_question', [QuestionGate::class, 'storeQuestion']);
         Gate::define('update_question', [QuestionGate::class, 'updateQuestion']);
         Gate::define('destroy_question', [QuestionGate::class, 'destroyQuestion']);
+
+        Gate::define('rate_comment', [CommentGate::class, 'rateComment']);
+        Gate::define('store_comment', [CommentGate::class, 'storeComment']);
+        Gate::define('update_comment', [CommentGate::class, 'updateComment']);
+        Gate::define('destroy_comment', [CommentGate::class, 'destroyComment']);
+
     }
 }

@@ -3,6 +3,8 @@
 namespace App\Gates;
 
 use App\Models\Post;
+use Error;
+use Exception;
 use Illuminate\Contracts\Auth\Authenticatable;
 
 class PostGate
@@ -16,7 +18,7 @@ class PostGate
     {
         try {
             return !$user->getCoursesIds()->intersect(Post::find(app()->request->id)->courseId)->isEmpty();
-        } catch (\Exception) {
+        } catch (Exception|Error) {
             return false;
         }
     }
@@ -30,7 +32,7 @@ class PostGate
     {
         try {
             return !$user->getCoursesIds()->intersect(Post::find(app()->request->postId)->courseId)->isEmpty();
-        } catch (\Exception) {
+        } catch (Exception|Error) {
             return false;
         }
     }
@@ -45,7 +47,7 @@ class PostGate
     {
         try {
             return !$user->getCoursesIds()->intersect(Post::find(app()->request->id)->courseId)->isEmpty();
-        } catch (\Exception) {
+        } catch (Exception|Error) {
             return false;
         }
     }
@@ -59,7 +61,7 @@ class PostGate
     {
         try {
             return !$user->getCoursesIds()->intersect(app()->request->get('courseId'))->isEmpty();
-        } catch (\Exception) {
+        } catch (Exception|Error) {
             return false;
         }
     }
@@ -76,7 +78,7 @@ class PostGate
                 ->where('user_id', $user->getId())
                 ->where('user_role', $user->getRole())
                 ->get()->isEmpty();
-        } catch (\Exception) {
+        } catch (Exception|Error) {
             return false;
         }
     }
