@@ -57,6 +57,7 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('destroy_question', [QuestionGate::class, 'destroyQuestion']);
 
         Gate::define('rate_comment', [CommentGate::class, 'rateComment']);
+        Gate::define('show_comments', [CommentGate::class, 'showComments']);
         Gate::define('store_comment', [CommentGate::class, 'storeComment']);
         Gate::define('update_comment', [CommentGate::class, 'updateComment']);
         Gate::define('destroy_comment', [CommentGate::class, 'destroyComment']);

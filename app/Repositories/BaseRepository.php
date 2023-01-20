@@ -2,7 +2,6 @@
 
 namespace App\Repositories;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
@@ -67,6 +66,17 @@ class BaseRepository
     public function findManyBy(array $criteria) : null|Collection
     {
         $query = $this->applyCriteria($criteria);
+
+        return $query->get();
+    }
+
+    public function paginateBy(array $criteria, int $from, int $offset) : Collection|array
+    {
+        $query = $this
+            ->applyCriteria($criteria)
+            ->orderByDesc('created_at')
+            ->skip($from)
+            ->take($offset);
 
         return $query->get();
     }

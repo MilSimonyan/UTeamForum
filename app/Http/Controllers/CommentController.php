@@ -49,7 +49,6 @@ class CommentController extends Controller
         return new JsonResponse($comment, JsonResponse::HTTP_CREATED);
     }
 
-
     /**
      * @throws \Illuminate\Validation\ValidationException
      */

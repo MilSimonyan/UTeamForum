@@ -26,14 +26,34 @@ class PostController extends Controller
      */
     public function index(Request $request) : JsonResponse
     {
-        return new JsonResponse($this->postRepository->findManyBy(
+        $from = $request->from ?? 0;
+        $offset = $request->offset ?? 10;
+
+        $posts = $this->postRepository->paginateBy(
             [
                 [
                     'course_id',
                     $request->user()->getCoursesIds()->toArray()
                 ]
-            ]
-        ), JsonResponse::HTTP_OK);
+            ],
+            $from,
+            $offset
+        );
+
+        $nextUrl = sprintf(
+            '/api/post?from=%d&offset=%d',
+            $from + $offset,
+            10
+        );
+
+        if ($posts->count() != $offset) {
+            $nextUrl = null;
+        }
+
+        return new JsonResponse([
+            'questions' => $posts,
+            'nextUrl'   => $nextUrl
+        ], JsonResponse::HTTP_OK);
     }
 
     /**

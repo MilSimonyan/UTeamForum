@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Question;
+use App\Repositories\CommentRepository;
 use App\Repositories\QuestionRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -11,10 +12,12 @@ use Illuminate\Support\Facades\Storage;
 class QuestionController extends Controller
 {
     protected QuestionRepository $questionRepository;
+    protected CommentRepository $commentRepository;
 
-    public function __construct(QuestionRepository $questionRepository)
+    public function __construct(QuestionRepository $questionRepository, CommentRepository $commentRepository)
     {
         $this->questionRepository = $questionRepository;
+        $this->commentRepository = $commentRepository;
     }
 
     /**
@@ -26,15 +29,35 @@ class QuestionController extends Controller
      */
     public function index(Request $request) : JsonResponse
     {
-        return new JsonResponse(
-            $this->questionRepository->findManyBy(
+        $from = $request->from ?? 0;
+        $offset = $request->offset ?? 10;
+
+        $questions = $this->questionRepository->paginateBy(
+            [
                 [
-                    [
-                        'course_id',
-                        $request->user()->getCoursesIds()->toArray()
-                    ]
+                    'course_id',
+                    $request->user()->getCoursesIds()->toArray()
                 ]
-            ), JsonResponse::HTTP_OK);
+            ],
+            $from,
+            $offset
+        );
+
+        $nextUrl = sprintf(
+            '/api/question?from=%d&offset=%d',
+            $from + $offset,
+            10
+        );
+
+        if ($questions->count() != $offset) {
+            $nextUrl = null;
+        }
+
+        return new JsonResponse([
+            'questions' => $questions,
+            'nextUrl'   => $nextUrl
+        ],
+            JsonResponse::HTTP_OK);
     }
 
     /**
@@ -47,6 +70,45 @@ class QuestionController extends Controller
     public function show(int $id) : JsonResponse
     {
         return new JsonResponse($this->questionRepository->find($id), JsonResponse::HTTP_OK);
+    }
+
+    /**
+     * @param \Illuminate\Http\Request $request
+     * @param int                      $id
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function comments(Request $request, int $id) : JsonResponse
+    {
+        $from = $request->from ?? 0;
+        $offset = $request->offset ?? 10;
+
+        $comments = $this->commentRepository->paginateBy(
+            [
+                [
+                    'question_id',
+                    $id
+                ]
+            ],
+            $from,
+            $offset
+        );
+
+        $nextUrl = sprintf(
+            '/api/question/%d/comments?from=%d&offset=%d',
+            $id,
+            $from + $offset,
+            5
+        );
+
+        if ($comments->count() != $offset) {
+            $nextUrl = null;
+        }
+
+        return new JsonResponse([
+            'comments' => $comments,
+            'nextUrl'  => $nextUrl
+        ], JsonResponse::HTTP_OK);
     }
 
     /**
