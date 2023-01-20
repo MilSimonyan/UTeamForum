@@ -72,7 +72,6 @@ Route::middleware('auth:sso')->controller(TagController::class)
         Route::GET('/', 'index');
         Route::GET('/{id}', 'show');
         Route::POST('/', 'store');
-        Route::PATCH('/{id}', 'update');
         Route::DELETE('/{id}', 'destroy');
     });
 

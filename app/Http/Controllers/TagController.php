@@ -60,28 +60,6 @@ class TagController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @param int                      $id
-     *
-     * @return \Illuminate\Http\JsonResponse
-     * @throws \Illuminate\Validation\ValidationException
-     */
-    public function update(Request $request, int $id) : JsonResponse
-    {
-        $this->validate($request, [
-            'name' => ['string', 'min:2', 'max:30', 'unique:tags,name']
-        ]);
-
-        $tag = $this->tagRepository->find($id);
-        $tag->name = $request->get('name', $tag->name);
-        $tag->save();
-
-        return new JsonResponse($tag, JsonResponse::HTTP_OK);
-    }
-
-    /**
      * Remove the specified resource from storage.
      *
      * @param int $id
