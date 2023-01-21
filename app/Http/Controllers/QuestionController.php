@@ -92,7 +92,7 @@ class QuestionController extends Controller
             ],
             $from,
             $offset
-        );
+        )->where('parent_id', null);
 
         $nextUrl = sprintf(
             '/api/question/%d/comments?from=%d&offset=%d',
