@@ -40,7 +40,8 @@ class Question extends Model
     ];
 
     protected $appends = [
-        'likedByMe'
+        'likedByMe',
+        'commentsUrl'
     ];
 
     protected $withCount = [
@@ -49,7 +50,6 @@ class Question extends Model
 
     protected $with = [
         'tags',
-        'comments'
     ];
 
     /**
@@ -57,7 +57,7 @@ class Question extends Model
      */
     public function comments() : HasMany
     {
-        return $this->hasMany(Comment::class)->where('parent_id',null);
+        return $this->hasMany(Comment::class)->where('parent_id', null);
     }
 
     /**
@@ -83,7 +83,7 @@ class Question extends Model
     {
         $path = storage_path(self::QUESTION_MEDIA_STORAGE);
         return Attribute::make(
-            get: fn($value) => $path . $value,
+            get: fn($value) => $path.$value,
         );
     }
 
@@ -97,5 +97,13 @@ class Question extends Model
             ->where('user_id', Auth::user()->getId())
             ->where('user_role', Auth::user()->getRole())
             ->exists();
+    }
+
+    /**
+     * @return string
+     */
+    protected function getCommentsUrlAttribute() : string
+    {
+        return route('questionComments', $this->id, false).'?from=0&offset=5';
     }
 }

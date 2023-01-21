@@ -31,6 +31,26 @@ class CommentGate
         }
     }
 
+    /**
+     * @param \Illuminate\Contracts\Auth\Authenticatable $user
+     *
+     * @return bool
+     */
+    public function showComments(Authenticatable $user) : bool
+    {
+        try {
+            return !$user
+                ->getCoursesIds()
+                ->intersect(
+                    Question::find(app()->request->id)
+                        ->first()
+                        ->courseId
+                )->isEmpty();
+        } catch (Exception|Error) {
+            return false;
+        }
+    }
+
 
     /**
      * @param \Illuminate\Contracts\Auth\Authenticatable $user
