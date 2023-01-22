@@ -1,4 +1,3 @@
-
 # API Reference
 
 ## POST
@@ -15,7 +14,6 @@
   GET /api/post?from=0&offset=5
 ```
 
-
 ### Create a new post
 
 ```http
@@ -24,14 +22,13 @@
   Content-Type: multipart/form-data
 ```
 
-| Parameter | Type     | Description                       |
-| :-------- | :------- | :-------------------------------- |
-| `title`      | `string` | **Required**.  The title of the post **Length** min:3 max:100|
-| `content`      | `string` | **Required**.  The content of the post **Length** min:3 max:3000|
-| `media`      | `mimes` | **Optional**. jpg,jpeg,png,gif,mp4,mov,ogg |
-| `tags`      | `array:int` | **Optional**.  The tags(id) must be exists|
-| `courseId`      | `int` | **Required**. Must be exists |
-
+| Parameter  | Type        | Description                                                      |
+|:-----------|:------------|:-----------------------------------------------------------------|
+| `title`    | `string`    | **Required**.  The title of the post **Length** min:3 max:100    |
+| `content`  | `string`    | **Required**.  The content of the post **Length** min:3 max:3000 |
+| `media`    | `mimes`     | **Optional**. jpg,jpeg,png,gif,mp4,mov,ogg                       |
+| `tags`     | `array:int` | **Optional**.  The tags(id) must be exists                       |
+| `courseId` | `int`       | **Required**. Must be exists                                     |
 
 ### Update a post
 
@@ -41,13 +38,12 @@
   Content-Type: multipart/form-data
 ```
 
-| Parameter | Type     | Description                       |
-| :-------- | :------- | :-------------------------------- |
-| `title`      | `string` | **Optional**.  The title of the post **Length** min:3 max:100|
-| `content`      | `string` | **Optional**.  The content of the post **Length** min:3 max:3000|
-| `media`      | `mimes` | **Optional**. jpg,jpeg,png,gif,mp4,mov,ogg |
-| `tags`      | `array:int` | **Optional**.  The tags(id) must be exists|
-
+| Parameter | Type        | Description                                                      |
+|:----------|:------------|:-----------------------------------------------------------------|
+| `title`   | `string`    | **Optional**.  The title of the post **Length** min:3 max:100    |
+| `content` | `string`    | **Optional**.  The content of the post **Length** min:3 max:3000 |
+| `media`   | `mimes`     | **Optional**. jpg,jpeg,png,gif,mp4,mov,ogg                       |
+| `tags`    | `array:int` | **Optional**.  The tags(id) must be exists                       |
 
 ### Show a post
 
@@ -69,10 +65,9 @@
   Content-Type: appliation/json
 ```
 
-| Parameter | Type     | Description                       |
-| :-------- | :------- | :-------------------------------- |
-| `postId`      | `int` | **Required**. The post(id) must be exists|
-
+| Parameter | Type  | Description                               |
+|:----------|:------|:------------------------------------------|
+| `postId`  | `int` | **Required**. The post(id) must be exists |
 
 ## QUESTION
 
@@ -96,14 +91,13 @@
   Content-Type: multipart/form-data
 ```
 
-| Parameter | Type     | Description                       |
-| :-------- | :------- | :-------------------------------- |
-| `title`      | `string` | **Required**.  The title of the question **Length** min:3 max:100|
-| `content`      | `string` | **Required**.  The content of the question **Length** min:3 max:3000|
-| `media`      | `mimes` | **Optional**. jpg,jpeg,png,gif,mp4,mov,ogg |
-| `tags`      | `array:int` | **Optional**.  The tags(id) must be exists|
-| `courseId`      | `int` | **Required**. Must be exists |
-
+| Parameter  | Type        | Description                                                          |
+|:-----------|:------------|:---------------------------------------------------------------------|
+| `title`    | `string`    | **Required**.  The title of the question **Length** min:3 max:100    |
+| `content`  | `string`    | **Required**.  The content of the question **Length** min:3 max:3000 |
+| `media`    | `mimes`     | **Optional**. jpg,jpeg,png,gif,mp4,mov,ogg                           |
+| `tags`     | `array:int` | **Optional**.  The tags(id) must be exists                           |
+| `courseId` | `int`       | **Required**. Must be exists                                         |
 
 ### Update a question you can update question 5 minutes after adding
 
@@ -113,13 +107,12 @@
   Content-Type: multipart/form-data
 ```
 
-| Parameter | Type     | Description                       |
-| :-------- | :------- | :-------------------------------- |
-| `title`      | `string` | **Optional**.  The title of the question **Length** min:3 max:100|
-| `content`      | `string` | **Optional**.  The content of the question **Length** min:3 max:3000|
-| `media`      | `mimes` | **Optional**. jpg,jpeg,png,gif,mp4,mov,ogg |
-| `tags`      | `array:int` | **Optional**.  The tags(id) must be exists|
-
+| Parameter | Type        | Description                                                          |
+|:----------|:------------|:---------------------------------------------------------------------|
+| `title`   | `string`    | **Optional**.  The title of the question **Length** min:3 max:100    |
+| `content` | `string`    | **Optional**.  The content of the question **Length** min:3 max:3000 |
+| `media`   | `mimes`     | **Optional**. jpg,jpeg,png,gif,mp4,mov,ogg                           |
+| `tags`    | `array:int` | **Optional**.  The tags(id) must be exists                           |
 
 ### Get question comments
 
@@ -153,11 +146,9 @@
   Content-Type: appliation/json
 ```
 
-| Parameter | Type     | Description                       |
-| :-------- | :------- | :-------------------------------- |
-| `questionId`      | `int` | **Required**. The question(id) must be exists|
-
-
+| Parameter    | Type  | Description                                   |
+|:-------------|:------|:----------------------------------------------|
+| `questionId` | `int` | **Required**. The question(id) must be exists |
 
 ## COMMENTS
 
@@ -169,14 +160,12 @@
   Content-Type: multipart/form-data
 ```
 
-| Parameter | Type     | Description                       |
-| :-------- | :------- | :-------------------------------- |
-| `content`      | `string` | **Required**.  The content of the comment **Length** min:3 max:3000|
-| `questionId`      | `int` | **Required**. Must be exists |
-| `media`      | `mimes` | **Optional**. jpg,jpeg,png,gif,mp4,mov,ogg |
-| `parentId`      | `int` | **Optional**. Must be exists |
-
-
+| Parameter    | Type     | Description                                                         |
+|:-------------|:---------|:--------------------------------------------------------------------|
+| `content`    | `string` | **Required**.  The content of the comment **Length** min:3 max:3000 |
+| `questionId` | `int`    | **Required**. Must be exists                                        |
+| `media`      | `mimes`  | **Optional**. jpg,jpeg,png,gif,mp4,mov,ogg                          |
+| `parentId`   | `int`    | **Optional**. Must be exists                                        |
 
 ### Update a comment you can update comment 5 minutes after adding
 
@@ -186,11 +175,10 @@
   Content-Type: multipart/form-data
 ```
 
-| Parameter | Type     | Description                       |
-| :-------- | :------- | :-------------------------------- |
-| `content`      | `string` | **Optional**.  The content of the comment **Length** min:3 max:3000|
-| `media`      | `mimes` | **Optional**. jpg,jpeg,png,gif,mp4,mov,ogg |
-
+| Parameter | Type     | Description                                                         |
+|:----------|:---------|:--------------------------------------------------------------------|
+| `content` | `string` | **Optional**.  The content of the comment **Length** min:3 max:3000 |
+| `media`   | `mimes`  | **Optional**. jpg,jpeg,png,gif,mp4,mov,ogg                          |
 
 ### Delete a comment
 
@@ -206,11 +194,10 @@
   Content-Type: appliation/json
 ```
 
-| Parameter | Type     | Description                       |
-| :-------- | :------- | :-------------------------------- |
-| `commentId`      | `int` | **Required**. The comment(id) must be exists|
-| `value`      | `int` | **Required**. The value must be similar to one of these enums(-1,0,1)|
-
+| Parameter   | Type  | Description                                                           |
+|:------------|:------|:----------------------------------------------------------------------|
+| `commentId` | `int` | **Required**. The comment(id) must be exists                          |
+| `value`     | `int` | **Required**. The value must be similar to one of these enums(-1,0,1) |
 
 ## TAGS *In progress..*
 
@@ -234,10 +221,9 @@
   Content-Type: appliation/json
 ```
 
-| Parameter | Type     | Description                       |
-| :-------- | :------- | :-------------------------------- |
-| `name`      | `string` | **Required**.  The title of the question **Length** min:2 max:30 **Unique**. name|
-
+| Parameter | Type     | Description                                                                       |
+|:----------|:---------|:----------------------------------------------------------------------------------|
+| `name`    | `string` | **Required**.  The title of the question **Length** min:2 max:30 **Unique**. name |
 
 ### Delete a tag
 
