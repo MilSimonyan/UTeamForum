@@ -94,7 +94,7 @@ class SsoProvider extends EloquentUserProvider
     public function retrieveByAuthGateway() : null|Authenticatable
     {
         try {
-            $response = HttpCaller::get('http://account.u-team.com/user');
+            $response = HttpCaller::get(env('SSO_URL').'/user');
 
             if ($response->role == 'admin')
             {
