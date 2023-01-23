@@ -12,12 +12,10 @@ use Illuminate\Support\Facades\Storage;
 class QuestionController extends Controller
 {
     protected QuestionRepository $questionRepository;
-    protected CommentRepository $commentRepository;
 
     public function __construct(QuestionRepository $questionRepository, CommentRepository $commentRepository)
     {
         $this->questionRepository = $questionRepository;
-        $this->commentRepository = $commentRepository;
     }
 
     /**
@@ -81,18 +79,13 @@ class QuestionController extends Controller
     public function comments(Request $request, int $id) : JsonResponse
     {
         $from = $request->from ?? 0;
-        $offset = $request->offset ?? 10;
+        $offset = $request->offset ?? 5;
 
-        $comments = $this->commentRepository->paginateBy(
-            [
-                [
-                    'question_id',
-                    $id
-                ]
-            ],
-            $from,
-            $offset
-        )->where('parent_id', null);
+        $comments = $this
+            ->questionRepository
+            ->find($id)
+            ->comments($from, $offset)
+            ->get();
 
         $nextUrl = sprintf(
             '/api/question/%d/comments?from=%d&offset=%d',

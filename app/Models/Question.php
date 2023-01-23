@@ -53,11 +53,19 @@ class Question extends Model
     ];
 
     /**
+     * @param int $from
+     * @param int $offset
+     *
      * @return HasMany
      */
-    public function comments() : HasMany
+    public function comments(int $from = 0, int $offset = 5) : HasMany
     {
-        return $this->hasMany(Comment::class)->where('parent_id', null);
+        return $this
+            ->hasMany(Comment::class)
+            ->orderByDesc('created_at')
+            ->where('parent_id', null)
+            ->skip($from)
+            ->take($offset);
     }
 
     /**

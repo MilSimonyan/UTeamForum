@@ -39,16 +39,25 @@ class Comment extends Model
         'children'
     ];
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function children() : HasMany
     {
         return $this->hasMany(Comment::class, 'parent_id', 'id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
     public function parent() : HasOne
     {
         return $this->hasOne(Comment::class, 'parent_id', 'id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function question() : BelongsTo
     {
         return $this->belongsTo(Question::class);

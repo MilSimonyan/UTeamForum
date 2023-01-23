@@ -41,7 +41,7 @@ Route::middleware('auth:sso')->controller(QuestionController::class)
     ->group(function () {
         Route::GET('/', 'index');
         Route::GET('/{id}', 'show')->middleware('can:show_question');
-        Route::GET('/{id}/comments', 'comments')->middleware('can:show_comments')->name('questionComments');//TODO BUG
+        Route::GET('/{id}/comments', 'comments')->middleware('can:show_comments')->name('questionComments');
         Route::POST('/', 'store')->middleware('can:store_question');
         Route::POST('/{id}', 'update')->middleware('can:update_question');
         Route::DELETE('/{id}', 'destroy')->middleware('can:destroy_question');
