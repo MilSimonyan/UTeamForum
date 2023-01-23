@@ -223,7 +223,8 @@ class User implements Jsonable, JsonSerializable, Authenticatable
             $this->courses = $this->toCollection(
                 HttpCaller::get(
                     sprintf(
-                        'http://account.u-team.com/api/%s/%s',
+                        '%s/api/%s/%s',
+                        env('SSO_URL'),
                         $this->role,
                         $this->role == 'student' ? 'course' : 'courses'
                     )
@@ -253,7 +254,8 @@ class User implements Jsonable, JsonSerializable, Authenticatable
             $this->departments = $this->toCollection(
                 HttpCaller::get(
                     sprintf(
-                        'http://account.u-team.com/api/%s/%s',
+                        '%s/api/%s/%s',
+                        env('SSO_URL'),
                         $this->role,
                         'department'
                     )
