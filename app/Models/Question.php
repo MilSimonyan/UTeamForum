@@ -8,7 +8,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use stdClass;
 
 /**
  * @property string $title
@@ -34,9 +36,13 @@ class Question extends Model
      * @var string[]
      */
     protected $fillable = [
+        'id',
         'title',
         'content',
         'media',
+        'user_role',
+        'user_id',
+        'course_id',
     ];
 
     protected $appends = [
@@ -113,5 +119,24 @@ class Question extends Model
     protected function getCommentsUrlAttribute() : string
     {
         return route('questionComments', $this->id, false).'?from=0&offset=5';
+    }
+
+    /**
+     * @param stdClass $question
+     *
+     * @return $this
+     */
+    public function fromStdClass(stdClass $question) : static
+    {
+        $this->id = $question->id;
+        $this->title = $question->title;
+        $this->content = $question->content;
+        $this->media = $question->media;
+        $this->user_role = $question->user_role;
+        $this->user_id = $question->user_id;
+        $this->course_id = $question->course_id;
+        $this->refresh()->load('tags');
+
+        return $this;
     }
 }

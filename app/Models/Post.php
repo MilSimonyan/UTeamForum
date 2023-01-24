@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Auth;
+use stdClass;
 
 /**
  * @property string $title
@@ -30,6 +31,7 @@ class Post extends Model
     ];
 
     protected $fillable = [
+        'id',
         'title',
         'content',
         'media',
@@ -82,5 +84,24 @@ class Post extends Model
             ->where('user_id', Auth::user()->getId())
             ->where('user_role', Auth::user()->getRole())
             ->exists();
+    }
+
+    /**
+     * @param \stdClass $post
+     *
+     * @return $this
+     */
+    public function fromStdClass(stdClass $post) : static
+    {
+        $this->id = $post->id;
+        $this->title = $post->title;
+        $this->content = $post->content;
+        $this->media = $post->media;
+        $this->user_role = $post->user_role;
+        $this->user_id = $post->user_id;
+        $this->course_id = $post->course_id;
+        $this->refresh()->load('tags');
+
+        return $this;
     }
 }

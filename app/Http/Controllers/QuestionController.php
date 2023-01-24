@@ -134,7 +134,7 @@ class QuestionController extends Controller
         $question->course_id = $request->get('courseId');
         $question->save();
         $question->tags()->sync($request->get('tags'));
-        $question->refresh()->load('tags', 'comments');
+        $question->refresh()->load('tags');
 
         return new JsonResponse($question, JsonResponse::HTTP_CREATED);
     }

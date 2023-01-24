@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\CommentRateController;
+use App\Http\Controllers\ForumController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\PostLikeController;
 use App\Http\Controllers\QuestionController;
@@ -23,7 +24,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sso')->controller(PostController::class)
     ->prefix('/post')
     ->group(function () {
-        Route::GET('/', 'index');
+        Route::GET('/', 'index');//TODO=need to create middleware
         Route::POST('/', 'store')->middleware('can:store_post');
         Route::POST('/{id}', 'update')->middleware('can:update_post');
         Route::GET('/{id}', 'show')->middleware('can:show_post');
@@ -39,7 +40,7 @@ Route::middleware('auth:sso')->controller(PostLikeController::class)
 Route::middleware('auth:sso')->controller(QuestionController::class)
     ->prefix('/question')
     ->group(function () {
-        Route::GET('/', 'index');
+        Route::GET('/', 'index');//TODO=need to create middleware
         Route::GET('/{id}', 'show')->middleware('can:show_question');
         Route::GET('/{id}/comments', 'comments')->middleware('can:show_comments')->name('questionComments');
         Route::POST('/', 'store')->middleware('can:store_question');
@@ -70,10 +71,16 @@ Route::middleware('auth:sso')->controller(CommentRateController::class)
 Route::middleware('auth:sso')->controller(TagController::class)
     ->prefix('/tag')
     ->group(function () {
-        Route::GET('/', 'index');
+        Route::GET('/', 'index');//TODO=need to create middleware
         Route::GET('/{id}', 'show');
         Route::POST('/', 'store');
         Route::DELETE('/{id}', 'destroy');
+    });
+
+Route::middleware('auth:sso')->controller(ForumController::class)
+    ->prefix('/forum')
+    ->group(function () {
+        Route::GET('/', 'index');//TODO=need to create middleware
     });
 
 Route::middleware('auth:sso')->get('/user', function () {
