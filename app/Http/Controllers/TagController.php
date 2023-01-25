@@ -37,7 +37,7 @@ class TagController extends Controller
         $from = $request->from ?? 0;
         $offset = $request->offset ?? 10;
 
-        $items = $this->forumRepository->paginateBy(
+        $tags = $this->tagRepository->paginateBy(
             [
                 [
                     'course_id',
@@ -49,18 +49,19 @@ class TagController extends Controller
         );
 
         $nextUrl = sprintf(
-            '/api/tag?from=%d&offset=%d',
+            '/api/tag?courseId=%d&from=%d&offset=%d',
+            $request->courseId,
             $from + $offset,
             10
         );
 
-        if ($items->count() != $offset) {
+        if ($tags->count() != $offset) {
             $nextUrl = null;
         }
 
         return new JsonResponse([
-            'questions' => $items,
-            'nextUrl'   => $nextUrl
+            'tags'    => $tags,
+            'nextUrl' => $nextUrl
         ],
             JsonResponse::HTTP_OK);
     }
@@ -76,11 +77,13 @@ class TagController extends Controller
     public function store(Request $request) : JsonResponse
     {
         $this->validate($request, [
-            'name' => ['required', 'string', 'min:2', 'max:30', 'unique:tags,name']
+            'name'     => ['required', 'string', 'min:2', 'max:30', 'unique:tags,name'],
+            'courseId' => ['required', 'int'],
         ]);
 
         $tag = new Tag();
         $tag->name = $request->get('name');
+        $tag->courseId = $request->get('courseId');
         $tag->save();
 
         return new JsonResponse($tag, JsonResponse::HTTP_CREATED);

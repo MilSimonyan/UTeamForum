@@ -44,7 +44,7 @@ Route::middleware('auth:sso')->controller(QuestionController::class)
         Route::GET('/{id}', 'show')->middleware('can:show_question');
         Route::GET('/{id}/comments', 'comments')->middleware('can:show_comments')->name('questionComments');
         Route::POST('/', 'store')->middleware('can:store_question');
-        Route::POST('/{id}', 'update')->middleware('can:update_question');
+        Route::POST('/{id}', 'update')/*->middleware('can:update_question')*/;
         Route::DELETE('/{id}', 'destroy')->middleware('can:destroy_question');
     });
 
@@ -74,7 +74,6 @@ Route::middleware('auth:sso')->controller(TagController::class)
         Route::GET('/', 'index');//TODO=need to create middleware
         Route::GET('/{id}', 'show');
         Route::POST('/', 'store');
-        Route::DELETE('/{id}', 'destroy');
     });
 
 Route::middleware('auth:sso')->controller(ForumController::class)

@@ -39,7 +39,7 @@ class ForumRepository extends BaseRepository
             DB::raw("'Post' as model"),
             'posts.*'
         );
-dd($criteria[0]);
+
         if (is_array($criteria[0])) {
             foreach ($criteria as $criterion) {
                 $questions->where(...$criterion);
