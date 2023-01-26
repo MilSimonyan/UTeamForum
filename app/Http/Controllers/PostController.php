@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Models\Tag;
 use App\Repositories\PostRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -126,6 +127,11 @@ class PostController extends Controller
             $filename = $file->store('/', 'post');
         }
 
+        $postTags = $post->tags()->get()->pluck('id')->toArray();
+        $requestTags = $request->get('tags');
+
+        $difference = array_diff($postTags, $requestTags);
+
         $post->title = $request->get('title', $post->title);
         $post->content = $request->get('content', $post->content);
         $post->media = $filename ?? null;
@@ -135,6 +141,8 @@ class PostController extends Controller
         $post->save();
         $post->tags()->sync($request->get('tags', $post->tags()->get()));
         $post->refresh()->load('tags');
+
+        $this->postRepository->logicWhenTagShouldRemoved($difference);
 
         return new JsonResponse($post, JsonResponse::HTTP_CREATED);
     }
@@ -157,5 +165,15 @@ class PostController extends Controller
         $post->delete();
 
         return new JsonResponse('deleted', JsonResponse::HTTP_NO_CONTENT);
+    }
+
+    /**
+     * @param array $tagIds
+     *
+     * @return void
+     */
+    private function logicWhenTagShouldRemoved(array $tagIds) : void
+    {
+        Tag::whereIn('id', $tagIds)->delete();
     }
 }

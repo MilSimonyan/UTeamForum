@@ -3,12 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Question;
-use App\Models\Tag;
 use App\Repositories\CommentRepository;
 use App\Repositories\QuestionRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class QuestionController extends Controller
@@ -166,8 +164,7 @@ class QuestionController extends Controller
         $questionTags = $question->tags()->get()->pluck('id')->toArray();
         $requestTags = $request->get('tags');
 
-        $this->logicWhenTagShouldRemoved($questionTags,$requestTags);
-        dd(array_diff($questionTags, $requestTags));
+        $difference = array_diff($questionTags, $requestTags);
 
         $question->title = $request->get('title', $question->title);
         $question->content = $request->get('content', $question->content);
@@ -178,6 +175,8 @@ class QuestionController extends Controller
         $question->save();
         $question->tags()->sync($request->get('tags', $question->tags()->get()));
         $question->refresh()->load('tags', 'comments');
+
+        $this->questionRepository->logicWhenTagShouldRemoved($difference);
 
         return new JsonResponse($question, JsonResponse::HTTP_CREATED);
     }
@@ -200,23 +199,5 @@ class QuestionController extends Controller
         $question->delete();
 
         return new JsonResponse('deleted', JsonResponse::HTTP_NO_CONTENT);
-    }
-
-    private function logicWhenTagShouldRemoved(array $questionTags, array $requestTags, int $questionId)
-    {
-        $difference = array_diff($questionTags, $requestTags);
-        $tags = DB::table('tags')
-            ->whereNotIn('tags.id', function($query) {
-                $query->select('post_tag.tag_id')
-                    ->from('post_tag');
-            })
-            ->whereNotIn('tags.id', function($query) {
-                $query->select('question_tag.tag_id')
-                    ->from('question_tag');
-            })
-            ->whereIn('tags.id', $difference)
-            ->get();
-
-        dd($tags);
     }
 }
