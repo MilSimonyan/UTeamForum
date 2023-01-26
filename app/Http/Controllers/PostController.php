@@ -166,14 +166,4 @@ class PostController extends Controller
 
         return new JsonResponse('deleted', JsonResponse::HTTP_NO_CONTENT);
     }
-
-    /**
-     * @param array $tagIds
-     *
-     * @return void
-     */
-    private function logicWhenTagShouldRemoved(array $tagIds) : void
-    {
-        Tag::whereIn('id', $tagIds)->delete();
-    }
 }
