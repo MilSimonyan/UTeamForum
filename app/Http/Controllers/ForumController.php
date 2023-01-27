@@ -19,7 +19,6 @@ class ForumController extends Controller
      * Display a listing of the resource.
      *
      * @param \Illuminate\Http\Request $request
-     * @param int                      $courseId
      *
      * @return \Illuminate\Http\JsonResponse
      */
@@ -38,7 +37,8 @@ class ForumController extends Controller
         );
 
         $nextUrl = sprintf(
-            '/api/forum?from=%d&offset=%d',
+            '/api/forum?courseId=%d&from=%d&offset=%d',
+            $request->courseId,
             $from + $offset,
             10
         );

@@ -14,6 +14,20 @@ class QuestionGate
      *
      * @return bool
      */
+    public function indexQuestion(Authenticatable $user) : bool
+    {
+        try {
+            return !$user->getCoursesIds()->intersect(app()->request->courseId)->isEmpty();
+        } catch (Exception|Error) {
+            return false;
+        }
+    }
+
+    /**
+     * @param \Illuminate\Contracts\Auth\Authenticatable $user
+     *
+     * @return bool
+     */
     public function showQuestion(Authenticatable $user) : bool
     {
         try {

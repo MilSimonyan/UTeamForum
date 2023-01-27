@@ -91,13 +91,14 @@ class Question extends Model
     }
 
     /**
+     * added absolute url for media files
+     *
      * @return \Illuminate\Database\Eloquent\Casts\Attribute
      */
     protected function media() : Attribute
     {
-        $path = storage_path(self::QUESTION_MEDIA_STORAGE);
         return Attribute::make(
-            get: fn($value) => $path.$value,
+            get: fn($value) => asset(self::QUESTION_MEDIA_STORAGE.$value),
         );
     }
 

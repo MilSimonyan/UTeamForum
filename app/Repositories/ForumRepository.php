@@ -55,17 +55,6 @@ class ForumRepository extends BaseRepository
                 $posts
             )->orderByDesc('created_at')->skip($from)->take($offset)->get();
 
-//        $forumItems = DB::table('questions')->select(
-//            DB::raw("'Question' as model"),
-//            'questions.*'
-//        )->where(...$criteria)
-//            ->union(
-//                DB::table('posts')->select(
-//                    DB::raw("'Post' as model"),
-//                    'posts.*'
-//                )->where(...$criteria)
-//            )->orderByDesc('created_at')->skip($from)->take($offset)->get();
-
         return $forumItems->map(function ($item) {
             $post = new Post();
             $question = new Question();

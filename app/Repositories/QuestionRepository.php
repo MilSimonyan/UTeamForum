@@ -19,6 +19,11 @@ class QuestionRepository extends BaseRepository
      */
     public function logicWhenTagShouldRemoved(array $tagIds) : void
     {
-        Tag::whereIn('id', $tagIds)->delete();
+        Tag::whereNotIn('id', function ($query) {
+            $query->select('tag_id')->from('question_tag')
+                ->union(function ($query) {
+                    $query->select('tag_id')->from('post_tag');
+                });
+        })->whereIn('id', $tagIds)->delete();
     }
 }

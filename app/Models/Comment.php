@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Traits\AttributesModifier;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -23,6 +24,7 @@ class Comment extends Model
     use HasFactory,
         AttributesModifier;
 
+    const COMMENT_MEDIA_STORAGE = 'storage/media/comment/';
     public $timestamps = true;
 
     protected $fillable = [
@@ -89,5 +91,17 @@ class Comment extends Model
     protected function getRateValueAttribute() : int
     {
         return $this->rates()->sum('value') ?? 0;
+    }
+
+    /**
+     * added absolute url for media files
+     *
+     * @return \Illuminate\Database\Eloquent\Casts\Attribute
+     */
+    protected function media() : Attribute
+    {
+        return Attribute::make(
+            get: fn($value) => asset(self::COMMENT_MEDIA_STORAGE.$value),
+        );
     }
 }

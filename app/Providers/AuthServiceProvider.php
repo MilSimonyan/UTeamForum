@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Gates\CommentGate;
 use App\Gates\PostGate;
 use App\Gates\QuestionGate;
+use App\Gates\TagGate;
 use App\Services\Auth\SsoGuard;
 use App\Services\Auth\SsoProvider;
 use Illuminate\Foundation\Application;
@@ -44,12 +45,14 @@ class AuthServiceProvider extends ServiceProvider
             );
         });
 
+        Gate::define('index_post', [PostGate::class, 'indexPost']);
         Gate::define('show_post', [PostGate::class, 'showPost']);
         Gate::define('like_post', [PostGate::class, 'likePost']);
         Gate::define('store_post', [PostGate::class, 'storePost']);
         Gate::define('update_post', [PostGate::class, 'updatePost']);
         Gate::define('destroy_post', [PostGate::class, 'destroyPost']);
 
+        Gate::define('index_question', [QuestionGate::class, 'indexQuestion']);
         Gate::define('show_question', [QuestionGate::class, 'showQuestion']);
         Gate::define('like_question', [QuestionGate::class, 'likeQuestion']);
         Gate::define('store_question', [QuestionGate::class, 'storeQuestion']);
@@ -61,6 +64,9 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('store_comment', [CommentGate::class, 'storeComment']);
         Gate::define('update_comment', [CommentGate::class, 'updateComment']);
         Gate::define('destroy_comment', [CommentGate::class, 'destroyComment']);
+
+        Gate::define('index_forum_items', [TagGate::class, 'indexForumItems']);
+        Gate::define('store_tag', [TagGate::class, 'storeTag']);
 
     }
 }

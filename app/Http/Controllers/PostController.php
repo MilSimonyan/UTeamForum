@@ -34,7 +34,7 @@ class PostController extends Controller
             [
                 [
                     'course_id',
-                    $request->user()->getCoursesIds()->toArray()
+                    $request->courseId
                 ]
             ],
             $from,
@@ -42,7 +42,8 @@ class PostController extends Controller
         );
 
         $nextUrl = sprintf(
-            '/api/post?from=%d&offset=%d',
+            '/api/post?courseId=%d&from=%d&offset=%d',
+            $request->courseId,
             $from + $offset,
             10
         );

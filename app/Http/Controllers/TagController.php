@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Tag;
-use App\Repositories\ForumRepository;
 use App\Repositories\TagRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -14,15 +13,10 @@ class TagController extends Controller
      * @var \App\Repositories\TagRepository
      */
     protected TagRepository $tagRepository;
-    /**
-     * @var \App\Repositories\ForumRepository
-     */
-    private ForumRepository $forumRepository;
 
-    public function __construct(TagRepository $tagRepository, ForumRepository $forumRepository)
+    public function __construct(TagRepository $tagRepository)
     {
         $this->tagRepository = $tagRepository;
-        $this->forumRepository = $forumRepository;
     }
 
     /**
@@ -64,6 +58,50 @@ class TagController extends Controller
             'nextUrl' => $nextUrl
         ],
             JsonResponse::HTTP_OK);
+    }
+
+    /**
+     * @param \Illuminate\Http\Request $request
+     * @param int                      $id
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function forumItems(Request $request, int $id) : JsonResponse
+    {
+        $from = $request->from ?? 0;
+        $offset = $request->offset ?? 10;
+
+        $forumItems = $this->tagRepository->paginateBy(
+            [
+                [
+                    'course_id',
+                    $request->courseId
+                ],
+                [
+                    'tag_id',
+                    $id
+                ]
+            ],
+            $from,
+            $offset
+        );
+
+        $nextUrl = sprintf(
+            '/api/tag/%d/forum-items?courseId=%d&from=%d&offset=%d',
+            $id,
+            $request->courseId,
+            $from + $offset,
+            10
+        );
+
+        if ($forumItems->count() != $offset) {
+            $nextUrl = null;
+        }
+
+        return new JsonResponse([
+            'data'    => $forumItems,
+            'nextUrl' => $nextUrl
+        ], JsonResponse::HTTP_OK);
     }
 
     /**

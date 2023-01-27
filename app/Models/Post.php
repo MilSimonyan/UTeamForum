@@ -68,9 +68,8 @@ class Post extends Model
      */
     protected function media() : Attribute
     {
-        $path = storage_path(self::POST_MEDIA_STORAGE);
         return Attribute::make(
-            get: fn($value) => $path.$value,
+            get: fn($value) => asset(self::POST_MEDIA_STORAGE.$value),
         );
     }
 

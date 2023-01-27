@@ -24,7 +24,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sso')->controller(PostController::class)
     ->prefix('/post')
     ->group(function () {
-        Route::GET('/', 'index');//TODO=need to create middleware
+        Route::GET('/', 'index')->middleware('can:index_post');
         Route::POST('/', 'store')->middleware('can:store_post');
         Route::POST('/{id}', 'update')->middleware('can:update_post');
         Route::GET('/{id}', 'show')->middleware('can:show_post');
@@ -40,11 +40,11 @@ Route::middleware('auth:sso')->controller(PostLikeController::class)
 Route::middleware('auth:sso')->controller(QuestionController::class)
     ->prefix('/question')
     ->group(function () {
-        Route::GET('/', 'index');//TODO=need to create middleware
+        Route::GET('/', 'index')->middleware('can:index_question');
         Route::GET('/{id}', 'show')->middleware('can:show_question');
         Route::GET('/{id}/comments', 'comments')->middleware('can:show_comments')->name('questionComments');
         Route::POST('/', 'store')->middleware('can:store_question');
-        Route::POST('/{id}', 'update')/*->middleware('can:update_question')*/;
+        Route::POST('/{id}', 'update')->middleware('can:update_question');
         Route::DELETE('/{id}', 'destroy')->middleware('can:destroy_question');
     });
 
@@ -71,15 +71,16 @@ Route::middleware('auth:sso')->controller(CommentRateController::class)
 Route::middleware('auth:sso')->controller(TagController::class)
     ->prefix('/tag')
     ->group(function () {
-        Route::GET('/', 'index');//TODO=need to create middleware
+        Route::GET('/', 'index');
         Route::GET('/{id}', 'show');
-        Route::POST('/', 'store');
+        Route::GET('/{id}/forum-items', 'forumItems')->middleware('can:index_forum_items');
+        Route::POST('/', 'store')->middleware('can:store_tag');
     });
 
 Route::middleware('auth:sso')->controller(ForumController::class)
     ->prefix('/forum')
     ->group(function () {
-        Route::GET('/', 'index');//TODO=need to create middleware
+        Route::GET('/', 'index')->middleware('can:index_forum_items');
     });
 
 Route::middleware('auth:sso')->get('/user', function () {
