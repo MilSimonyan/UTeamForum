@@ -22,8 +22,7 @@ Generate a new application key
 
     php artisan key:generate
 
-Run the database migrations (**Set the database connection in .env before migrating
-**) [Environment variables](#environment-variables)
+Run the database migrations (**Set the database connection in .env before migrating**) [Environment variables](#environment-variables)
 
     php artisan migrate
 
