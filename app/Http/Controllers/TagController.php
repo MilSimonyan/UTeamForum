@@ -31,20 +31,13 @@ class TagController extends Controller
         $from = $request->from ?? 0;
         $offset = $request->offset ?? 10;
 
-        $tags = $this->tagRepository->paginateBy(
-            [
-                [
-                    'course_id',
-                    $request->courseId
-                ]
-            ],
+        $tags = $this->tagRepository->paginateBy([],
             $from,
             $offset
         );
 
         $nextUrl = sprintf(
-            '/api/tag?courseId=%d&from=%d&offset=%d',
-            $request->courseId,
+            '/api/tag?from=%d&offset=%d',
             $from + $offset,
             10
         );
@@ -71,7 +64,7 @@ class TagController extends Controller
         $from = $request->from ?? 0;
         $offset = $request->offset ?? 10;
 
-        $forumItems = $this->tagRepository->paginateBy(
+        $forumItems = $this->tagRepository->paginateForForumItems(
             [
                 [
                     'course_id',

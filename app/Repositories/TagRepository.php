@@ -22,7 +22,7 @@ class TagRepository extends BaseRepository
      *
      * @return \Illuminate\Support\Collection|array
      */
-    public function paginateBy(array $criteria, int $from, int $offset) : Collection|array
+    public function paginateForForumItems(array $criteria, int $from, int $offset) : Collection|array
     {
         $questions = DB::table('questions')->select(
             DB::raw("'Question' as model"),
