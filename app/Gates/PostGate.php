@@ -51,7 +51,6 @@ class PostGate
         }
     }
 
-
     /**
      * @param \Illuminate\Contracts\Auth\Authenticatable $user
      *

@@ -34,7 +34,7 @@ class QuestionController extends Controller
             [
                 [
                     'course_id',
-                    $request->user()->getCoursesIds()->toArray()
+                    $request->courseId
                 ]
             ],
             $from,
@@ -42,7 +42,8 @@ class QuestionController extends Controller
         );
 
         $nextUrl = sprintf(
-            '/api/question?from=%d&offset=%d',
+            '/api/question?courseId=%dfrom=%d&offset=%d',
+            $request->courseId,
             $from + $offset,
             10
         );
@@ -171,7 +172,6 @@ class QuestionController extends Controller
         $question->media = $filename ?? $question->media;
         $question->user_role = $request->user()->getRole();
         $question->user_id = $request->user()->getId();
-        $question->course_id = $request->get('courseId', $question->course_id);
         $question->save();
         $question->tags()->sync($request->get('tags', $question->tags()->get()));
         $question->refresh()->load('tags', 'comments');

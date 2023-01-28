@@ -25,6 +25,7 @@ class Comment extends Model
         AttributesModifier;
 
     const COMMENT_MEDIA_STORAGE = 'storage/media/comment/';
+
     public $timestamps = true;
 
     protected $fillable = [

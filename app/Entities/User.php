@@ -226,7 +226,7 @@ class User implements Jsonable, JsonSerializable, Authenticatable
                         '%s/api/%s/%s',
                         env('SSO_URL'),
                         $this->role,
-                        $this->role=='student'?'course':'courses'
+                        $this->role == 'student' ? 'course' : 'courses'
                     )
                 ) ?? $courses
             );

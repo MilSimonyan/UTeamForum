@@ -1,17 +1,18 @@
+
 # API Reference
 
 ## POST
 
-### Get all posts
+### Get all(0-10) posts. To sort the records in descending order of created_at
 
 ```http
-  GET /api/post/
+  GET /api/post?courseId={id}
 ```
 
-### Paginate post
+### Paginate posts. To sort the records in descending order of created_at
 
 ```http
-  GET /api/post?from=0&offset=5
+  GET /api/post?courseId={id}from=0&offset=5
 ```
 
 ### Create a new post
@@ -71,16 +72,16 @@
 
 ## QUESTION
 
-### Get all questions
+### Get all(0-10) questions. To sort the records in descending order of created_at
 
 ```http
-  GET /api/question/
+  GET /api/question?courseId={id}
 ```
 
-### Paginate question
+### Paginate questions. To sort the records in descending order of created_at
 
 ```http
-  GET /api/question?from=0&offset=5
+  GET /api/question?courseId={id}&from=0&offset=10
 ```
 
 ### Create a new question
@@ -114,13 +115,13 @@
 | `media`   | `mimes`     | **Optional**. jpg,jpeg,png,gif,mp4,mov,ogg                           |
 | `tags`    | `array:int` | **Optional**.  The tags(id) must be exists                           |
 
-### Get question comments
+### Get question comments(0-5). To sort the records in descending order of created_at
 
 ```http
   GET /api/question/{id}/comments
 ```
 
-### Paginate question comments
+### Paginate question comments. To sort the records in descending order of created_at
 
 ```http
   GET /api/question/{id}/comments?from=0&offset=5
@@ -199,12 +200,18 @@
 | `commentId` | `int` | **Required**. The comment(id) must be exists                          |
 | `value`     | `int` | **Required**. The value must be similar to one of these enums(-1,0,1) |
 
-## TAGS *In progress..*
+## TAGS
 
-### Get all tags
+### Get all(0-10) tags. To sort the records in descending order of created_at
 
 ```http
-  GET /api/tag/
+  GET /api/tag?courseId={id}
+```
+
+### Paginate tags. To sort the records in descending order of created_at
+
+```http
+  GET /api/tag?courseId={id}&from=0&offset=10
 ```
 
 ### Show a tag
@@ -223,10 +230,32 @@
 
 | Parameter | Type     | Description                                                                       |
 |:----------|:---------|:----------------------------------------------------------------------------------|
-| `name`    | `string` | **Required**.  The title of the question **Length** min:2 max:30 **Unique**. name |
+| `name`    | `string` | **Required**.  The name of the tag **Length** min:2 max:30 **Unique**. name |
+| `courseId`    | `int` | **Required**|
 
-### Delete a tag
+### Get a forum items where have selected tag(0-10). To sort the records in descending order of created_at
 
 ```http
-  DELETE /api/tag/{id}
+  GET /api/tag/{id}/forum-items?courseId={id}
+
+```
+
+### Paginate a forum items where have selected tag. To sort the records in descending order of created_at
+
+```http
+  GET /api/tag/{id}/forum-items?courseId={id}&from=0&offset=10
+```
+
+## FORUM
+
+### Get all(0-10) forum items(questions & posts) To sort the records in descending order of created_at
+
+```http
+  GET /api/forum?courseId=?
+```
+
+### Paginate forum items(questions & posts) To sort the records in descending order of created_at
+
+```http
+  GET /api/forum?courseId=?&from=0&offset=10
 ```

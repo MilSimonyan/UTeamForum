@@ -51,7 +51,6 @@ class CommentGate
         }
     }
 
-
     /**
      * @param \Illuminate\Contracts\Auth\Authenticatable $user
      *

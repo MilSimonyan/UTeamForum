@@ -131,19 +131,4 @@ class TagController extends Controller
     {
         return new JsonResponse($this->tagRepository->find($id), JsonResponse::HTTP_OK);
     }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param int $id
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function destroy(int $id) : JsonResponse
-    {
-        $tag = $this->tagRepository->find($id);
-        $tag->delete();
-
-        return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
-    }
 }
