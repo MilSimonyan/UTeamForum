@@ -51,7 +51,7 @@ class PostController extends Controller
         }
 
         return new JsonResponse([
-            'questions' => $posts,
+            'posts' => $posts,
             'nextUrl'   => $nextUrl
         ], JsonResponse::HTTP_OK);
     }
