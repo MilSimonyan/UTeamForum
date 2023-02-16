@@ -33,9 +33,9 @@ class PostLikeController extends Controller
 
         $likedByMe = $this->likeRepository->findOneBy(
             [
-                ['post_id' , $request->get('postId')],
-                ['user_id' , Auth::user()->getId()],
-                ['user_role' , Auth::user()->getRole()]
+                ['post_id', $request->get('postId')],
+                ['user_id', Auth::user()->getId()],
+                ['user_role', Auth::user()->getRole()]
             ],
             false
         );

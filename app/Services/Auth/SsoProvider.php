@@ -5,12 +5,9 @@ namespace App\Services\Auth;
 use App\Entities\User;
 use App\Facades\HttpCaller;
 use Exception;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Auth\EloquentUserProvider;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
-use Illuminate\Support\Facades\Cookie;
 
 class SsoProvider extends EloquentUserProvider
 {
@@ -51,7 +48,7 @@ class SsoProvider extends EloquentUserProvider
      * Method is not relevant for our authentication mechanism.
      *
      * @param Authenticatable $user
-     * @param string                                     $token
+     * @param string          $token
      *
      * @return void
      */
@@ -77,7 +74,7 @@ class SsoProvider extends EloquentUserProvider
      * Method is not relevant for our authentication mechanism.
      *
      * @param Authenticatable $user
-     * @param array                                      $credentials
+     * @param array           $credentials
      *
      * @return bool
      */
@@ -96,8 +93,7 @@ class SsoProvider extends EloquentUserProvider
         try {
             $response = HttpCaller::get(env('SSO_URL').'/user');
 
-            if ($response->role == 'admin')
-            {
+            if ($response->role == 'admin') {
                 return null;
             }
 

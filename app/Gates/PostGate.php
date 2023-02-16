@@ -14,6 +14,20 @@ class PostGate
      *
      * @return bool
      */
+    public function indexPost(Authenticatable $user) : bool
+    {
+        try {
+            return !$user->getCoursesIds()->intersect(app()->request->courseId)->isEmpty();
+        } catch (Exception|Error) {
+            return false;
+        }
+    }
+
+    /**
+     * @param \Illuminate\Contracts\Auth\Authenticatable $user
+     *
+     * @return bool
+     */
     public function showPost(Authenticatable $user) : bool
     {
         try {
@@ -36,7 +50,6 @@ class PostGate
             return false;
         }
     }
-
 
     /**
      * @param \Illuminate\Contracts\Auth\Authenticatable $user

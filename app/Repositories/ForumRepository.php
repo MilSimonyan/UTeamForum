@@ -2,16 +2,22 @@
 
 namespace App\Repositories;
 
+use App\Models\Comment;
 use App\Models\Post;
 use App\Models\Question;
-use App\Models\Tag;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
-class TagRepository extends BaseRepository
+class ForumRepository extends BaseRepository
 {
-    public function __construct(Tag $model)
+    protected QuestionRepository $questionRepository;
+    protected PostRepository $postRepository;
+
+    public function __construct(Comment $model, PostRepository $postRepository, QuestionRepository $questionRepository)
     {
+        $this->postRepository = $postRepository;
+        $this->questionRepository = $questionRepository;
+
         parent::__construct($model);
     }
 
@@ -22,17 +28,17 @@ class TagRepository extends BaseRepository
      *
      * @return \Illuminate\Support\Collection|array
      */
-    public function paginateForForumItems(array $criteria, int $from, int $offset) : Collection|array
+    public function paginateBy(array $criteria, int $from, int $offset) : Collection|array
     {
         $questions = DB::table('questions')->select(
             DB::raw("'Question' as model"),
             'questions.*'
-        )->join('question_tag', 'questions.id', '=', 'question_tag.question_id');
+        );
 
         $posts = DB::table('posts')->select(
             DB::raw("'Post' as model"),
             'posts.*'
-        )->join('post_tag', 'posts.id', '=', 'post_tag.post_id');
+        );
 
         if (is_array($criteria[0])) {
             foreach ($criteria as $criterion) {

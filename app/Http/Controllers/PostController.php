@@ -33,7 +33,7 @@ class PostController extends Controller
             [
                 [
                     'course_id',
-                    $request->user()->getCoursesIds()->toArray()
+                    $request->courseId
                 ]
             ],
             $from,
@@ -41,7 +41,8 @@ class PostController extends Controller
         );
 
         $nextUrl = sprintf(
-            '/api/post?from=%d&offset=%d',
+            '/api/post?courseId=%d&from=%d&offset=%d',
+            $request->courseId,
             $from + $offset,
             10
         );
@@ -95,7 +96,6 @@ class PostController extends Controller
         $post->media = $filename ?? null;
         $post->user_role = $request->user()->getRole();
         $post->user_id = $request->user()->getId();
-        $post->course_id = $request->get('courseId');
         $post->save();
         $post->tags()->sync($request->get('tags'));
         $post->refresh()->load('tags');
@@ -126,6 +126,11 @@ class PostController extends Controller
             $filename = $file->store('/', 'post');
         }
 
+        $postTags = $post->tags()->get()->pluck('id')->toArray();
+        $requestTags = $request->get('tags');
+
+        $difference = array_diff($postTags, $requestTags);
+
         $post->title = $request->get('title', $post->title);
         $post->content = $request->get('content', $post->content);
         $post->media = $filename ?? null;
@@ -135,6 +140,8 @@ class PostController extends Controller
         $post->save();
         $post->tags()->sync($request->get('tags', $post->tags()->get()));
         $post->refresh()->load('tags');
+
+        $this->postRepository->logicWhenTagShouldRemoved($difference);
 
         return new JsonResponse($post, JsonResponse::HTTP_CREATED);
     }

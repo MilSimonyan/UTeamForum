@@ -34,7 +34,7 @@ class QuestionController extends Controller
             [
                 [
                     'course_id',
-                    $request->user()->getCoursesIds()->toArray()
+                    $request->courseId
                 ]
             ],
             $from,
@@ -42,7 +42,8 @@ class QuestionController extends Controller
         );
 
         $nextUrl = sprintf(
-            '/api/question?from=%d&offset=%d',
+            '/api/question?courseId=%dfrom=%d&offset=%d',
+            $request->courseId,
             $from + $offset,
             10
         );
@@ -134,7 +135,7 @@ class QuestionController extends Controller
         $question->course_id = $request->get('courseId');
         $question->save();
         $question->tags()->sync($request->get('tags'));
-        $question->refresh()->load('tags', 'comments');
+        $question->refresh()->load('tags');
 
         return new JsonResponse($question, JsonResponse::HTTP_CREATED);
     }
@@ -161,16 +162,21 @@ class QuestionController extends Controller
 
             $filename = $file->store('/', 'question');
         }
+        $questionTags = $question->tags()->get()->pluck('id')->toArray();
+        $requestTags = $request->get('tags');
+
+        $difference = array_diff($questionTags, $requestTags);
 
         $question->title = $request->get('title', $question->title);
         $question->content = $request->get('content', $question->content);
         $question->media = $filename ?? $question->media;
         $question->user_role = $request->user()->getRole();
         $question->user_id = $request->user()->getId();
-        $question->course_id = $request->get('courseId', $question->course_id);
         $question->save();
         $question->tags()->sync($request->get('tags', $question->tags()->get()));
         $question->refresh()->load('tags', 'comments');
+
+        $this->questionRepository->logicWhenTagShouldRemoved($difference);
 
         return new JsonResponse($question, JsonResponse::HTTP_CREATED);
     }
