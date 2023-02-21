@@ -96,6 +96,7 @@ class PostController extends Controller
         $post->media = $filename ?? null;
         $post->user_role = $request->user()->getRole();
         $post->user_id = $request->user()->getId();
+        $post->course_id = $request->get('courseId');
         $post->save();
         $post->tags()->sync($request->get('tags'));
         $post->refresh()->load('tags');
