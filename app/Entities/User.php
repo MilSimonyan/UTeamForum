@@ -47,6 +47,8 @@ class User implements Jsonable, JsonSerializable, Authenticatable
      */
     private string $role;
 
+    private string $thumbnail;
+
     /**
      * @var string|null
      */
@@ -267,6 +269,22 @@ class User implements Jsonable, JsonSerializable, Authenticatable
     }
 
     /**
+     * @return string
+     */
+    public function getThumbnail(): string
+    {
+        return $this->thumbnail;
+    }
+
+    /**
+     * @param string $thumbnail
+     */
+    public function setThumbnail(string $thumbnail): void
+    {
+        $this->thumbnail = $thumbnail;
+    }
+
+    /**
      * Get the name of the unique identifier for the user.
      *
      * @return string
@@ -343,7 +361,8 @@ class User implements Jsonable, JsonSerializable, Authenticatable
             'role'        => $this->getRole(),
             'position'    => $this->getPosition(),
             'courses'     => $this->getCourses(),
-            'departments' => $this->getDepartments()
+            'departments' => $this->getDepartments(),
+//            'thumbnail'   => $this->getThumbnail() TODO after added from user
         ];
     }
 
@@ -373,6 +392,7 @@ class User implements Jsonable, JsonSerializable, Authenticatable
         $this->setBirthDate($userData->birthDate ?? null);
         $this->setRole($userData->role);
         $this->setPosition($userData->position ?? null);
+//        $this->setThumbnail($userData->thumbnail); TODO after added from user
         $this->setCourses();
         $this->setDepartments();
 

@@ -132,6 +132,13 @@ class QuestionController extends Controller
         $question->media = $filename ?? null;
         $question->user_role = $request->user()->getRole();
         $question->user_id = $request->user()->getId();
+        $question->setUser([
+            'id'        => $question->user_id,
+            'firstName' => $request->user()->getLastName(),
+            'lastName'  => $request->user()->getLastName(),
+            'role'      => $question->user_role
+            //            'thumbnail' => auth()->user()->getThumbnail() TODO after added from user
+        ]);
         $question->course_id = $request->get('courseId');
         $question->save();
         $question->tags()->sync($request->get('tags'));

@@ -18,6 +18,8 @@ use stdClass;
  * @property string $user_role
  * @property int    $user_id
  * @property int    $course_id
+ * @property array  $user
+ * @property        $id
  */
 class Post extends Model
 {
@@ -27,7 +29,8 @@ class Post extends Model
     const POST_MEDIA_STORAGE = 'app/media/post/';
 
     protected $appends = [
-        'likedByMe'
+        'likedByMe',
+        'user'
     ];
 
     protected $fillable = [
@@ -36,6 +39,11 @@ class Post extends Model
         'content',
         'media',
     ];
+
+    /**
+     * @var array
+     */
+    private array $user;
 
     protected $withCount = [
         'likes'
@@ -86,6 +94,33 @@ class Post extends Model
     }
 
     /**
+     * @return array
+     */
+    protected function getUserAttribute(): array
+    {
+        if (isset($this->user))
+        {
+            return $this->user;
+        }
+
+        return [
+            'id'        => $this->user_id,
+            'firstName' => auth()->user()->getFirstName(),
+            'lastName'  => auth()->user()->getLastName(),
+            'role'      => $this->user_role
+            //            'thumbnail' => auth()->user()->getThumbnail() TODO after added from user
+        ];
+    }
+
+    /**
+     * @param array $user
+     */
+    public function setUser(array $user): void
+    {
+        $this->user = $user;
+    }
+
+    /**
      * @param \stdClass $post
      *
      * @return $this
@@ -96,8 +131,13 @@ class Post extends Model
         $this->title = $post->title;
         $this->content = $post->content;
         $this->media = $post->media;
-        $this->user_role = $post->user_role;
-        $this->user_id = $post->user_id;
+        $this->setUser([
+            'id'        => $post->user_id,
+            'firstName' => auth()->user()->getFirstName(),
+            'lastName'  => auth()->user()->getLastName(),
+            'role'      => $post->user_role
+//            'thumbnail' => auth()->user()->getThumbnail() TODO after added from user
+        ]);
         $this->course_id = $post->course_id;
         $this->refresh()->load('tags');
 

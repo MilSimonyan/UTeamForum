@@ -88,7 +88,9 @@ class PostController extends Controller
         ]);
 
         if ($file = $request->file('media'))
+        {
             $filename = $file->store('/', 'post');
+        }
 
         $post = new Post();
         $post->title = $request->get('title');
@@ -96,6 +98,13 @@ class PostController extends Controller
         $post->media = $filename ?? null;
         $post->user_role = $request->user()->getRole();
         $post->user_id = $request->user()->getId();
+        $post->setUser([
+            'id'        => $post->user_id,
+            'firstName' => $request->user()->getLastName(),
+            'lastName'  => $request->user()->getLastName(),
+            'role'      => $post->user_role
+            //            'thumbnail' => auth()->user()->getThumbnail() TODO after added from user
+        ]);
         $post->course_id = $request->get('courseId');
         $post->save();
         $post->tags()->sync($request->get('tags'));

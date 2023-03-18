@@ -18,6 +18,8 @@ use stdClass;
  * @property string $user_role
  * @property int    $user_id
  * @property int    $course_id
+ * @property array  $user
+ * @property        $id
  */
 class Question extends Model
 {
@@ -30,6 +32,11 @@ class Question extends Model
      * @var bool
      */
     public $timestamps = true;
+
+    /**
+     * @var array
+     */
+    private array $user;
 
     /**
      * @var string[]
@@ -46,7 +53,8 @@ class Question extends Model
 
     protected $appends = [
         'likedByMe',
-        'commentsUrl'
+        'commentsUrl',
+        'user'
     ];
 
     protected $withCount = [
@@ -121,6 +129,34 @@ class Question extends Model
         return route('questionComments', $this->id, false).'?from=0&offset=5';
     }
 
+
+    /**
+     * @return array
+     */
+    protected function getUserAttribute(): array
+    {
+        if (isset($this->user))
+        {
+            return $this->user;
+        }
+
+        return [
+            'id'        => $this->user_id,
+            'firstName' => auth()->user()->getFirstName(),
+            'lastName'  => auth()->user()->getLastName(),
+            'role'      => $this->user_role
+            //            'thumbnail' => auth()->user()->getThumbnail() TODO after added from user
+        ];
+    }
+
+    /**
+     * @param array $user
+     */
+    public function setUser(array $user): void
+    {
+        $this->user = $user;
+    }
+
     /**
      * @param stdClass $question
      *
@@ -132,8 +168,13 @@ class Question extends Model
         $this->title = $question->title;
         $this->content = $question->content;
         $this->media = $question->media;
-        $this->user_role = $question->user_role;
-        $this->user_id = $question->user_id;
+        $this->setUser([
+            'id'        => $question->user_id,
+            'firstName' => auth()->user()->getFirstName(),
+            'lastName'  => auth()->user()->getLastName(),
+            'role'      => $question->user_role
+            //            'thumbnail' => auth()->user()->getThumbnail() TODO after added from user
+        ]);
         $this->course_id = $question->course_id;
         $this->refresh()->load('tags');
 
