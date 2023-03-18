@@ -47,7 +47,10 @@ class User implements Jsonable, JsonSerializable, Authenticatable
      */
     private string $role;
 
-    private string $thumbnail;
+//    /**
+//     * @var string
+//     */
+//    private string $thumbnail; TODO in process...
 
     /**
      * @var string|null

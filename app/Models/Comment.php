@@ -26,7 +26,15 @@ class Comment extends Model
 
     const COMMENT_MEDIA_STORAGE = 'storage/media/comment/';
 
+    /**
+     * @var bool
+     */
     public $timestamps = true;
+
+    /**
+     * @var array
+     */
+    private array $user;
 
     protected $fillable = [
         'content',
@@ -35,7 +43,8 @@ class Comment extends Model
 
     protected $appends = [
         'ratedByMe',
-        'rateValue'
+        'rateValue',
+        'user'
     ];
 
     protected $with = [
@@ -104,5 +113,32 @@ class Comment extends Model
         return Attribute::make(
             get: fn($value) => asset(self::COMMENT_MEDIA_STORAGE.$value),
         );
+    }
+
+    /**
+     * @return array
+     */
+    protected function getUserAttribute(): array
+    {
+        if (isset($this->user))
+        {
+            return $this->user;
+        }
+
+        return [
+            'id'        => $this->userId,
+            'firstName' => auth()->user()->getFirstName(),
+            'lastName'  => auth()->user()->getLastName(),
+            'role'      => $this->userRole
+            //            'thumbnail' => auth()->user()->getThumbnail() TODO after added from user
+        ];
+    }
+
+    /**
+     * @param array $user
+     */
+    public function setUser(array $user): void
+    {
+        $this->user = $user;
     }
 }

@@ -43,7 +43,6 @@ class CommentGate
                 ->getCoursesIds()
                 ->intersect(
                     Question::find(app()->request->id)
-                        ->first()
                         ->courseId
                 )->isEmpty();
         } catch (Exception|Error) {
