@@ -26,7 +26,7 @@ class Question extends Model
     use HasFactory,
         AttributesModifier;
 
-    const QUESTION_MEDIA_STORAGE = 'app/media/question/';
+    const QUESTION_MEDIA_STORAGE = 'storage/media/question/';
 
     /**
      * @var bool

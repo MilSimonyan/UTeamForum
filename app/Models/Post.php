@@ -26,7 +26,7 @@ class Post extends Model
     use HasFactory,
         AttributesModifier;
 
-    const POST_MEDIA_STORAGE = 'app/media/post/';
+    const POST_MEDIA_STORAGE = 'storage/media/post/';
 
     protected $appends = [
         'likedByMe',
