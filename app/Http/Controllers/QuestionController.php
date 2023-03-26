@@ -3,19 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Models\Question;
-use App\Repositories\CommentRepository;
 use App\Repositories\QuestionRepository;
+use App\Services\ImageAdapter\ImageAdapter;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class QuestionController extends Controller
 {
-    protected QuestionRepository $questionRepository;
-
-    public function __construct(QuestionRepository $questionRepository, CommentRepository $commentRepository)
-    {
-        $this->questionRepository = $questionRepository;
+    public function __construct(
+        protected QuestionRepository $questionRepository,
+        protected ImageAdapter $imageAdapter
+    ) {
+        $this->imageAdapter->supportHeight = 800;
+        $this->imageAdapter->supportWidth = 600;
     }
 
     /**
@@ -25,7 +26,7 @@ class QuestionController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function index(Request $request) : JsonResponse
+    public function index(Request $request): JsonResponse
     {
         $from = $request->from ?? 0;
         $offset = $request->offset ?? 10;
@@ -66,7 +67,7 @@ class QuestionController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function show(int $id) : JsonResponse
+    public function show(int $id): JsonResponse
     {
         return new JsonResponse($this->questionRepository->find($id), JsonResponse::HTTP_OK);
     }
@@ -77,7 +78,7 @@ class QuestionController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function comments(Request $request, int $id) : JsonResponse
+    public function comments(Request $request, int $id): JsonResponse
     {
         $from = $request->from ?? 0;
         $offset = $request->offset ?? 5;
@@ -113,7 +114,7 @@ class QuestionController extends Controller
      * @return \Illuminate\Http\JsonResponse
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function store(Request $request) : JsonResponse
+    public function store(Request $request): JsonResponse
     {
         $this->validate($request, [
             'title'    => ['required', 'string', 'min:3', 'max:100'],
@@ -123,8 +124,15 @@ class QuestionController extends Controller
             'courseId' => ['required', 'integer'],
         ]);
 
-        if ($file = $request->file('media'))
-            $filename = $file->store('/', 'question');
+        if ($file = $request->file('media')) {
+            $image = $this->imageAdapter->make($file);
+            $this->imageAdapter->resize($image, $image->width(), $image->height());
+
+            $filename = hash('sha256', $image->filename).'.'.$file->extension();
+
+            $image->save(storage_path('/app/media/question/'.$filename));
+        }
+
 
         $question = new Question();
         $question->title = $request->get('title');
@@ -150,7 +158,7 @@ class QuestionController extends Controller
     /**
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function update(Request $request, int $id) : JsonResponse
+    public function update(Request $request, int $id): JsonResponse
     {
         $this->validate($request, [
             'title'   => ['string', 'min:3', 'max:100'],
@@ -195,13 +203,14 @@ class QuestionController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy(int $id) : JsonResponse
+    public function destroy(int $id): JsonResponse
     {
         /** @var Question $question */
         $question = $this->questionRepository->find($id);
 
-        if ($question->media)
+        if ($question->media) {
             Storage::disk('question')->delete($question->media);
+        }
 
         $question->delete();
 

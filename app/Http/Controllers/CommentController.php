@@ -4,17 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Models\Comment;
 use App\Repositories\CommentRepository;
+use App\Services\ImageAdapter\ImageAdapter;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class CommentController extends Controller
 {
-    protected CommentRepository $commentRepository;
-
-    public function __construct(CommentRepository $commentRepository)
-    {
-        $this->commentRepository = $commentRepository;
+    public function __construct(
+        protected CommentRepository $commentRepository,
+        protected ImageAdapter $imageAdapter
+    ) {
+        $this->imageAdapter->supportHeight = 600;
+        $this->imageAdapter->supportWidth = 400;
     }
 
     /**
@@ -34,8 +36,14 @@ class CommentController extends Controller
             'parentId'   => ['integer', 'exists:comments,id'],
         ]);
 
-        if ($file = $request->file('media'))
-            $filename = $file->store('/', 'comment');
+        if ($file = $request->file('media')) {
+            $image = $this->imageAdapter->make($file);
+            $this->imageAdapter->resize($image, $image->width(), $image->height());
+
+            $filename = hash('sha256', $image->filename).'.'.$file->extension();
+
+            $image->save(storage_path('/app/media/comment/'.$filename));
+        }
 
         $comment = new Comment();
         $comment->content = $request->get('content');

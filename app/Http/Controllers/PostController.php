@@ -4,17 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use App\Repositories\PostRepository;
+use App\Services\ImageAdapter\ImageAdapter;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
-    protected PostRepository $postRepository;
-
-    public function __construct(PostRepository $postRepository)
-    {
-        $this->postRepository = $postRepository;
+    public function __construct(
+        protected PostRepository $postRepository,
+        protected ImageAdapter $imageAdapter
+    ) {
+        $this->imageAdapter->supportHeight = 800;
+        $this->imageAdapter->supportWidth = 600;
     }
 
     /**
@@ -89,7 +91,12 @@ class PostController extends Controller
 
         if ($file = $request->file('media'))
         {
-            $filename = $file->store('/', 'post');
+            $image = $this->imageAdapter->make($file);
+            $this->imageAdapter->resize($image, $image->width(), $image->height());
+
+            $filename = hash('sha256', $image->filename).'.'.$file->extension();
+
+            $image->save(storage_path('/app/media/post/'.$filename));
         }
 
         $post = new Post();
