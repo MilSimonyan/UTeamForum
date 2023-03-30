@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Models\Tag;
 use App\Repositories\PostRepository;
 use App\Services\ImageAdapter\ImageAdapter;
 use Illuminate\Http\JsonResponse;
@@ -85,7 +86,7 @@ class PostController extends Controller
             'title'    => ['required', 'string', 'min:3', 'max:100'],
             'content'  => ['required', 'string', 'min:3', 'max:3000'],
             'media'    => ['mimes:jpg,jpeg,png,gif,mp4,mov,ogg'],
-            'tags'     => ['array', 'exists:tags,id'],
+            'tags'     => ['array'],
             'courseId' => ['required', 'integer'],
         ]);
 
@@ -98,6 +99,27 @@ class PostController extends Controller
 
             $image->save(storage_path('/app/media/post/'.$filename));
         }
+
+        $requestTags = array_unique($request->get('tags'));
+
+        $tagsFromDb = Tag::whereIn('name', $requestTags)
+            ->get('name')
+            ->map(fn ($item) => $item['name'])
+            ->values()
+            ->toArray();
+        $tags = array_diff($requestTags, $tagsFromDb);
+        $courseId = $request->get('courseId');
+
+        $tags = collect($tags)->map(function ($item) use ($courseId) {
+            return [
+                'course_id' => $courseId,
+                'name'      => $item,
+            ];
+        })->toArray();
+
+        Tag::insert($tags);
+
+        $tagIds = Tag::whereIn('name', $requestTags)->pluck('id')->toArray();
 
         $post = new Post();
         $post->title = $request->get('title');
@@ -114,7 +136,7 @@ class PostController extends Controller
         ]);
         $post->course_id = $request->get('courseId');
         $post->save();
-        $post->tags()->sync($request->get('tags'));
+        $post->tags()->sync($tagIds);
         $post->refresh()->load('tags');
 
         return new JsonResponse($post, JsonResponse::HTTP_CREATED);
