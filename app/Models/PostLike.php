@@ -7,6 +7,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property int    $postId
+ * @property string $user_role
+ * @property int    $user_id
+ */
 class PostLike extends Model
 {
     use HasFactory,
@@ -21,7 +26,7 @@ class PostLike extends Model
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function post() : BelongsTo
+    public function post(): BelongsTo
     {
         return $this->belongsTo(Post::class);
     }

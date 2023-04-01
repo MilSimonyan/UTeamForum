@@ -9,9 +9,12 @@ use App\Services\ImageAdapter\ImageAdapter;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Controllers\Traits\InteractsWithTags;
 
 class QuestionController extends Controller
 {
+    use InteractsWithTags;
+
     public function __construct(
         protected QuestionRepository $questionRepository,
         protected ImageAdapter $imageAdapter
@@ -120,7 +123,7 @@ class QuestionController extends Controller
         $this->validate($request, [
             'title'    => ['required', 'string', 'min:3', 'max:100'],
             'content'  => ['required', 'string', 'min:3', 'max:3000'],
-            'media'    => ['mimes:jpg,jpeg,png,gif,mp4,mov,ogg'],
+            'media'    => ['mimes:jpg,jpeg,png'],
             'tags'     => ['array'],
             'courseId' => ['required', 'integer'],
         ]);
@@ -128,32 +131,15 @@ class QuestionController extends Controller
         if ($file = $request->file('media')) {
             $image = $this->imageAdapter->make($file);
             $this->imageAdapter->resize($image, $image->width(), $image->height());
-
             $filename = hash('sha256', $image->filename).'.'.$file->extension();
-
             $image->save(storage_path('/app/media/question/'.$filename));
         }
 
-        $requestTags = array_unique($request->get('tags'));
-
-        $tagsFromDb = Tag::whereIn('name', $requestTags)
-            ->get('name')
-            ->map(fn ($item) => $item['name'])
-            ->values()
-            ->toArray();
-        $tags = array_diff($requestTags, $tagsFromDb);
-        $courseId = $request->get('courseId');
-
-        $tags = collect($tags)->map(function ($item) use ($courseId) {
-            return [
-                'course_id' => $courseId,
-                'name'      => $item,
-            ];
-        })->toArray();
-
-        Tag::insert($tags);
-
-        $tagIds = Tag::whereIn('name', $requestTags)->pluck('id')->toArray();
+        if ($request->get('tags')) {
+            $requestTags = array_unique($request->get('tags'));
+            $this->checkDbAndSaveNonExistentTags($requestTags, $request->get('courseId'));
+            $tagIds = Tag::whereIn('name', $requestTags)->pluck('id')->toArray();
+        }
 
         $question = new Question();
         $question->title = $request->get('title');
@@ -161,16 +147,18 @@ class QuestionController extends Controller
         $question->media = $filename ?? null;
         $question->user_role = $request->user()->getRole();
         $question->user_id = $request->user()->getId();
-        $question->setUser([
+        $question->author = json_encode([
             'id'        => $question->user_id,
-            'firstName' => $request->user()->getLastName(),
+            'firstName' => $request->user()->getFirstName(),
             'lastName'  => $request->user()->getLastName(),
             'role'      => $question->user_role
             //            'thumbnail' => auth()->user()->getThumbnail() TODO after added from user
         ]);
         $question->course_id = $request->get('courseId');
+        $question->likes = 0;
+
         $question->save();
-        $question->tags()->sync($tagIds);
+        $question->tags()->sync($tagIds ?? null);
         $question->refresh()->load('tags');
 
         return new JsonResponse($question, JsonResponse::HTTP_CREATED);
@@ -185,7 +173,7 @@ class QuestionController extends Controller
             'title'   => ['string', 'min:3', 'max:100'],
             'content' => ['string', 'min:3', 'max:3000'],
             'media'   => ['mimes:jpg,jpeg,png,gif,mp4,mov,ogg'],
-            'tags'    => ['array', 'exists:tags,id'],
+            'tags'    => ['array'],
         ]);
 
         /** @var Question $question */
@@ -198,8 +186,12 @@ class QuestionController extends Controller
 
             $filename = $file->store('/', 'question');
         }
+
+        $requestTags = array_unique($request->get('tags'));
         $questionTags = $question->tags()->get()->pluck('id')->toArray();
-        $requestTags = $request->get('tags');
+
+        $this->checkDbAndSaveNonExistentTags($requestTags, $question->course_id);
+        $requestTags = Tag::whereIn('name', $requestTags)->pluck('id')->toArray();
 
         $difference = array_diff($questionTags, $requestTags);
 
@@ -209,7 +201,7 @@ class QuestionController extends Controller
         $question->user_role = $request->user()->getRole();
         $question->user_id = $request->user()->getId();
         $question->save();
-        $question->tags()->sync($request->get('tags', $question->tags()->get()));
+        $question->tags()->sync($requestTags);
         $question->refresh()->load('tags', 'comments');
 
         $this->questionRepository->logicWhenTagShouldRemoved($difference);

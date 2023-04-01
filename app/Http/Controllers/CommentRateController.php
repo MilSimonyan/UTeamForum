@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Comment;
 use App\Models\CommentRate;
 use App\Repositories\CommentRateRepository;
 use Illuminate\Http\JsonResponse;
@@ -25,11 +26,13 @@ class CommentRateController extends Controller
      * @return \Illuminate\Http\JsonResponse
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function update(Request $request) : JsonResponse
+    public function update(Request $request): JsonResponse
     {
         $this->validate($request, [
             'commentId' => ['required', 'int', 'exists:comments,id'],
-            'value'     => ['required', 'int'],
+            'value'     => ['required', 'int', 'in:-1,0,1'],
+        ], [
+            'value.in' => 'The value must be -1, 0, or 1.',
         ]);
 
         $rateByMe = $this->commentRateRepository->findOneBy(
@@ -52,6 +55,10 @@ class CommentRateController extends Controller
             $commentRate->userRole = $request->user()->getRole();
             $commentRate->userId = $request->user()->getId();
             $commentRate->save();
+
+            $comment = Comment::find($commentRate->commentId);
+            $comment->rate += $commentRate->value;
+            $comment->save();
 
             return new JsonResponse($commentRate->value, JsonResponse::HTTP_OK);
         }

@@ -20,6 +20,8 @@ return new class extends Migration {
                 'teacher',
                 'student',
             ]);
+            $table->json('author');
+            $table->integer('rate')->default(0);
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('parent_id')->default(null)->nullable();
             $table->unsignedBigInteger('question_id');

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Post;
 use App\Models\PostLike;
 use App\Repositories\PostLikeRepository;
 use Illuminate\Http\JsonResponse;
@@ -25,7 +26,7 @@ class PostLikeController extends Controller
      * @return \Illuminate\Http\JsonResponse
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function update(Request $request) : JsonResponse
+    public function update(Request $request): JsonResponse
     {
         $this->validate($request, [
             'postId' => ['required', 'int', 'exists:posts,id'],
@@ -40,6 +41,8 @@ class PostLikeController extends Controller
             false
         );
 
+        $post = Post::find($request->get('postId'));
+
         if (!$likedByMe) {
             $postLike = new PostLike();
             $postLike->postId = $request->get('postId');
@@ -47,8 +50,14 @@ class PostLikeController extends Controller
             $postLike->user_id = $request->user()->getId();
             $postLike->save();
 
+            $post->likes += 1;
+            $post->save();
+
             return new JsonResponse(true, JsonResponse::HTTP_OK);
         }
+
+        $post->likes -= 1;
+        $post->save();
 
         $likedByMe->delete();
 

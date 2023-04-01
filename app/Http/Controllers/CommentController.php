@@ -50,8 +50,17 @@ class CommentController extends Controller
         $comment->questionId = $request->get('questionId');
         $comment->media = $filename ?? null;
         $comment->userRole = $request->user()->getRole();
+        $comment->author = json_encode([
+            'id'        => $comment->user_id,
+            'firstName' => $request->user()->getFirstName(),
+            'lastName'  => $request->user()->getLastName(),
+            'role'      => $comment->user_role
+            //            'thumbnail' => auth()->user()->getThumbnail() TODO after added from user
+        ]);
         $comment->userId = $request->user()->getId();
         $comment->parentId = $request->get('parentId');
+        $comment->rate = 0;
+
         $comment->save();
 
         return new JsonResponse($comment, JsonResponse::HTTP_CREATED);
@@ -82,6 +91,7 @@ class CommentController extends Controller
         $comment->media = $filename ?? $comment->media;
         $comment->userRole = $request->user()->getRole();
         $comment->userId = $request->user()->getId();
+
         $comment->save();
         $comment->refresh();
 

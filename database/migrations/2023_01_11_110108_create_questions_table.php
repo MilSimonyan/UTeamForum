@@ -21,6 +21,8 @@ return new class extends Migration {
                 'teacher',
                 'student',
             ]);
+            $table->json('author');
+            $table->unsignedInteger('likes')->default(0);
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('course_id');
             $table->timestamps();

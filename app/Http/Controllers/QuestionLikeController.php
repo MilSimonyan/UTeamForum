@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Question;
 use App\Models\QuestionLike;
 use App\Repositories\QuestionLikeRepository;
 use Illuminate\Http\JsonResponse;
@@ -40,6 +41,8 @@ class QuestionLikeController extends Controller
             false
         );
 
+        $question = Question::find($request->get('questionId'));
+
         if (!$likedByMe) {
             $questionLike = new QuestionLike();
             $questionLike->questionId = $request->get('questionId');
@@ -47,10 +50,16 @@ class QuestionLikeController extends Controller
             $questionLike->user_id = $request->user()->getId();
             $questionLike->save();
 
+            $question->likes += 1;
+            $question->save();
+
             return new JsonResponse(true, JsonResponse::HTTP_OK);
         }
 
         $likedByMe->delete();
+
+        $question->likes -= 1;
+        $question->save();
 
         return new JsonResponse(false, JsonResponse::HTTP_OK);
     }

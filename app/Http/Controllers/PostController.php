@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Traits\InteractsWithTags;
 use App\Models\Post;
 use App\Models\Tag;
 use App\Repositories\PostRepository;
@@ -12,6 +13,8 @@ use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
+    use InteractsWithTags;
+
     public function __construct(
         protected PostRepository $postRepository,
         protected ImageAdapter $imageAdapter
@@ -27,7 +30,7 @@ class PostController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function index(Request $request) : JsonResponse
+    public function index(Request $request): JsonResponse
     {
         $from = $request->from ?? 0;
         $offset = $request->offset ?? 10;
@@ -55,8 +58,8 @@ class PostController extends Controller
         }
 
         return new JsonResponse([
-            'posts' => $posts,
-            'nextUrl'   => $nextUrl
+            'posts'   => $posts,
+            'nextUrl' => $nextUrl
         ], JsonResponse::HTTP_OK);
     }
 
@@ -67,7 +70,7 @@ class PostController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function show(int $id) : JsonResponse
+    public function show(int $id): JsonResponse
     {
         return new JsonResponse($this->postRepository->find($id), JsonResponse::HTTP_OK);
     }
@@ -80,46 +83,28 @@ class PostController extends Controller
      * @return \Illuminate\Http\JsonResponse
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function store(Request $request) : JsonResponse
+    public function store(Request $request): JsonResponse
     {
         $this->validate($request, [
             'title'    => ['required', 'string', 'min:3', 'max:100'],
             'content'  => ['required', 'string', 'min:3', 'max:3000'],
-            'media'    => ['mimes:jpg,jpeg,png,gif,mp4,mov,ogg'],
+            'media'    => ['mimes:jpg,jpeg,png'],
             'tags'     => ['array'],
             'courseId' => ['required', 'integer'],
         ]);
 
-        if ($file = $request->file('media'))
-        {
+        if ($file = $request->file('media')) {
             $image = $this->imageAdapter->make($file);
             $this->imageAdapter->resize($image, $image->width(), $image->height());
-
             $filename = hash('sha256', $image->filename).'.'.$file->extension();
-
             $image->save(storage_path('/app/media/post/'.$filename));
         }
 
-        $requestTags = array_unique($request->get('tags'));
-
-        $tagsFromDb = Tag::whereIn('name', $requestTags)
-            ->get('name')
-            ->map(fn ($item) => $item['name'])
-            ->values()
-            ->toArray();
-        $tags = array_diff($requestTags, $tagsFromDb);
-        $courseId = $request->get('courseId');
-
-        $tags = collect($tags)->map(function ($item) use ($courseId) {
-            return [
-                'course_id' => $courseId,
-                'name'      => $item,
-            ];
-        })->toArray();
-
-        Tag::insert($tags);
-
-        $tagIds = Tag::whereIn('name', $requestTags)->pluck('id')->toArray();
+        if ($request->get('tags')) {
+            $requestTags = array_unique($request->get('tags'));
+            $this->checkDbAndSaveNonExistentTags($requestTags, $request->get('courseId'));
+            $tagIds = Tag::whereIn('name', $requestTags)->pluck('id')->toArray();
+        }
 
         $post = new Post();
         $post->title = $request->get('title');
@@ -127,16 +112,18 @@ class PostController extends Controller
         $post->media = $filename ?? null;
         $post->user_role = $request->user()->getRole();
         $post->user_id = $request->user()->getId();
-        $post->setUser([
+        $post->author = json_encode([
             'id'        => $post->user_id,
-            'firstName' => $request->user()->getLastName(),
+            'firstName' => $request->user()->getFirstName(),
             'lastName'  => $request->user()->getLastName(),
             'role'      => $post->user_role
             //            'thumbnail' => auth()->user()->getThumbnail() TODO after added from user
         ]);
         $post->course_id = $request->get('courseId');
+        $post->likes = 0;
+
         $post->save();
-        $post->tags()->sync($tagIds);
+        $post->tags()->sync($tagIds ?? null);
         $post->refresh()->load('tags');
 
         return new JsonResponse($post, JsonResponse::HTTP_CREATED);
@@ -145,13 +132,13 @@ class PostController extends Controller
     /**
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function update(Request $request, int $id) : JsonResponse
+    public function update(Request $request, int $id): JsonResponse
     {
         $this->validate($request, [
             'title'   => ['string', 'min:3', 'max:100'],
             'content' => ['string', 'min:3', 'max:3000'],
             'media'   => ['mimes:jpg,jpeg,png,gif,mp4,mov,ogg'],
-            'tags'    => ['array', 'exists:tags,id'],
+            'tags'    => ['array'],
         ]);
 
         /** @var Post $post */
@@ -165,8 +152,11 @@ class PostController extends Controller
             $filename = $file->store('/', 'post');
         }
 
+        $requestTags = array_unique($request->get('tags'));
         $postTags = $post->tags()->get()->pluck('id')->toArray();
-        $requestTags = $request->get('tags');
+        $this->checkDbAndSaveNonExistentTags($requestTags, $post->course_id);
+        $requestTags = Tag::whereIn('name', $requestTags)->pluck('id')->toArray();
+
 
         $difference = array_diff($postTags, $requestTags);
 
@@ -177,7 +167,7 @@ class PostController extends Controller
         $post->user_id = $request->user()->getId();
         $post->course_id = $request->get('courseId', $post->course_id);
         $post->save();
-        $post->tags()->sync($request->get('tags', $post->tags()->get()));
+        $post->tags()->sync($requestTags);
         $post->refresh()->load('tags');
 
         $this->postRepository->logicWhenTagShouldRemoved($difference);
@@ -192,13 +182,14 @@ class PostController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy(int $id) : JsonResponse
+    public function destroy(int $id): JsonResponse
     {
         /** @var Post $post */
         $post = $this->postRepository->find($id);
 
-        if ($post->media)
+        if ($post->media) {
             Storage::disk('post')->delete($post->media);
+        }
 
         $post->delete();
 

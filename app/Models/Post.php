@@ -19,7 +19,9 @@ use stdClass;
  * @property int    $user_id
  * @property int    $course_id
  * @property array  $user
- * @property        $id
+ * @property int    $id
+ * @property string $author
+ * @property int    $likes
  */
 class Post extends Model
 {
@@ -30,7 +32,6 @@ class Post extends Model
 
     protected $appends = [
         'likedByMe',
-        'user'
     ];
 
     protected $fillable = [
@@ -38,16 +39,13 @@ class Post extends Model
         'title',
         'content',
         'media',
+        'author'
     ];
 
     /**
      * @var array
      */
     private array $user;
-
-    protected $withCount = [
-        'likes'
-    ];
 
     protected $with = [
         'tags',
@@ -56,7 +54,7 @@ class Post extends Model
     /**
      * @return HasMany
      */
-    public function likes() : HasMany
+    public function likes(): HasMany
     {
         return $this->hasMany(PostLike::class);
     }
@@ -64,7 +62,7 @@ class Post extends Model
     /**
      * @return BelongsToMany
      */
-    public function tags() : BelongsToMany
+    public function tags(): BelongsToMany
     {
         return $this->belongsToMany(Tag::class);
     }
@@ -74,17 +72,17 @@ class Post extends Model
      *
      * @return \Illuminate\Database\Eloquent\Casts\Attribute
      */
-    protected function media() : Attribute
+    protected function media(): Attribute
     {
         return Attribute::make(
-            get: fn($value) => asset(self::POST_MEDIA_STORAGE.$value),
+            get: fn ($value) => asset(self::POST_MEDIA_STORAGE.$value),
         );
     }
 
     /**
      * @return bool
      */
-    protected function getLikedByMeAttribute() : bool
+    protected function getLikedByMeAttribute(): bool
     {
         return $this
             ->likes()
@@ -94,30 +92,15 @@ class Post extends Model
     }
 
     /**
-     * @return array
+     * modify post author to array
+     *
+     * @return \Illuminate\Database\Eloquent\Casts\Attribute
      */
-    protected function getUserAttribute(): array
+    protected function author(): Attribute
     {
-        if (isset($this->user))
-        {
-            return $this->user;
-        }
-
-        return [
-            'id'        => $this->user_id,
-            'firstName' => auth()->user()->getFirstName(),
-            'lastName'  => auth()->user()->getLastName(),
-            'role'      => $this->user_role
-            //            'thumbnail' => auth()->user()->getThumbnail() TODO after added from user
-        ];
-    }
-
-    /**
-     * @param array $user
-     */
-    public function setUser(array $user): void
-    {
-        $this->user = $user;
+        return Attribute::make(
+            get: fn ($value) => json_decode($value, true),
+        );
     }
 
     /**
@@ -125,20 +108,15 @@ class Post extends Model
      *
      * @return $this
      */
-    public function fromStdClass(stdClass $post) : static
+    public function fromStdClass(stdClass $post): static
     {
         $this->id = $post->id;
         $this->title = $post->title;
         $this->content = $post->content;
         $this->media = $post->media;
-        $this->setUser([
-            'id'        => $post->user_id,
-            'firstName' => auth()->user()->getFirstName(),
-            'lastName'  => auth()->user()->getLastName(),
-            'role'      => $post->user_role
-//            'thumbnail' => auth()->user()->getThumbnail() TODO after added from user
-        ]);
+        $this->author = $post->author;
         $this->course_id = $post->course_id;
+        $this->likes = $post->likes;
         $this->refresh()->load('tags');
 
         return $this;

@@ -19,7 +19,9 @@ use stdClass;
  * @property int    $user_id
  * @property int    $course_id
  * @property array  $user
- * @property        $id
+ * @property int    $id
+ * @property string $author
+ * @property int    $likes
  */
 class Question extends Model
 {
@@ -53,12 +55,7 @@ class Question extends Model
 
     protected $appends = [
         'likedByMe',
-        'commentsUrl',
-        'user'
-    ];
-
-    protected $withCount = [
-        'likes'
+        'commentsUrl'
     ];
 
     protected $with = [
@@ -71,7 +68,7 @@ class Question extends Model
      *
      * @return HasMany
      */
-    public function comments(int $from = 0, int $offset = 5) : HasMany
+    public function comments(int $from = 0, int $offset = 5): HasMany
     {
         return $this
             ->hasMany(Comment::class)
@@ -84,7 +81,7 @@ class Question extends Model
     /**
      * @return HasMany
      */
-    public function likes() : HasMany
+    public function likes(): HasMany
     {
         return $this->hasMany(QuestionLike::class);
     }
@@ -92,7 +89,7 @@ class Question extends Model
     /**
      * @return BelongsToMany
      */
-    public function tags() : BelongsToMany
+    public function tags(): BelongsToMany
     {
         return $this->belongsToMany(Tag::class);
     }
@@ -102,17 +99,29 @@ class Question extends Model
      *
      * @return \Illuminate\Database\Eloquent\Casts\Attribute
      */
-    protected function media() : Attribute
+    protected function media(): Attribute
     {
         return Attribute::make(
-            get: fn($value) => asset(self::QUESTION_MEDIA_STORAGE.$value),
+            get: fn ($value) => asset(self::QUESTION_MEDIA_STORAGE.$value),
+        );
+    }
+
+    /**
+     * modify question author to array
+     *
+     * @return \Illuminate\Database\Eloquent\Casts\Attribute
+     */
+    protected function author(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => json_decode($value, true),
         );
     }
 
     /**
      * @return bool
      */
-    protected function getLikedByMeAttribute() : bool
+    protected function getLikedByMeAttribute(): bool
     {
         return $this
             ->likes()
@@ -124,37 +133,9 @@ class Question extends Model
     /**
      * @return string
      */
-    protected function getCommentsUrlAttribute() : string
+    protected function getCommentsUrlAttribute(): string
     {
         return route('questionComments', $this->id, false).'?from=0&offset=5';
-    }
-
-
-    /**
-     * @return array
-     */
-    protected function getUserAttribute(): array
-    {
-        if (isset($this->user))
-        {
-            return $this->user;
-        }
-
-        return [
-            'id'        => $this->user_id,
-            'firstName' => auth()->user()->getFirstName(),
-            'lastName'  => auth()->user()->getLastName(),
-            'role'      => $this->user_role
-            //            'thumbnail' => auth()->user()->getThumbnail() TODO after added from user
-        ];
-    }
-
-    /**
-     * @param array $user
-     */
-    public function setUser(array $user): void
-    {
-        $this->user = $user;
     }
 
     /**
@@ -162,19 +143,14 @@ class Question extends Model
      *
      * @return $this
      */
-    public function fromStdClass(stdClass $question) : static
+    public function fromStdClass(stdClass $question): static
     {
         $this->id = $question->id;
         $this->title = $question->title;
         $this->content = $question->content;
         $this->media = $question->media;
-        $this->setUser([
-            'id'        => $question->user_id,
-            'firstName' => auth()->user()->getFirstName(),
-            'lastName'  => auth()->user()->getLastName(),
-            'role'      => $question->user_role
-            //            'thumbnail' => auth()->user()->getThumbnail() TODO after added from user
-        ]);
+        $this->author = $question->author;
+        $this->likes = $question->likes;
         $this->course_id = $question->course_id;
         $this->refresh()->load('tags');
 
