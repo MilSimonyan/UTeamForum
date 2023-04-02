@@ -18,7 +18,6 @@ use stdClass;
  * @property string $user_role
  * @property int    $user_id
  * @property int    $course_id
- * @property array  $user
  * @property int    $id
  * @property string $author
  * @property int    $likes
@@ -41,11 +40,6 @@ class Post extends Model
         'media',
         'author'
     ];
-
-    /**
-     * @var array
-     */
-    private array $user;
 
     protected $with = [
         'tags',

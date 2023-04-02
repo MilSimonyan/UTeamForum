@@ -35,11 +35,6 @@ class Comment extends Model
      */
     public $timestamps = true;
 
-    /**
-     * @var array
-     */
-    private array $user;
-
     protected $fillable = [
         'content',
         'rate'

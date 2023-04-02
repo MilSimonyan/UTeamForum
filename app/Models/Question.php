@@ -18,7 +18,6 @@ use stdClass;
  * @property string $user_role
  * @property int    $user_id
  * @property int    $course_id
- * @property array  $user
  * @property int    $id
  * @property string $author
  * @property int    $likes
@@ -34,11 +33,6 @@ class Question extends Model
      * @var bool
      */
     public $timestamps = true;
-
-    /**
-     * @var array
-     */
-    private array $user;
 
     /**
      * @var string[]
