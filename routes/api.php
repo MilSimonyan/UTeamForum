@@ -73,7 +73,6 @@ Route::middleware('auth:sso')->controller(TagController::class)
     ->group(function () {
         Route::GET('/', 'index');
         Route::GET('/{id}', 'show');
-        Route::GET('/{id}/forum-items', 'forumItems')->middleware('can:index_forum_items');
         Route::POST('/', 'store')->middleware('can:store_tag');
     });
 

@@ -54,50 +54,6 @@ class TagController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param int                      $id
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function forumItems(Request $request, int $id) : JsonResponse
-    {
-        $from = $request->from ?? 0;
-        $offset = $request->offset ?? 10;
-
-        $forumItems = $this->tagRepository->paginateForForumItems(
-            [
-                [
-                    'course_id',
-                    $request->courseId
-                ],
-                [
-                    'tag_id',
-                    $id
-                ]
-            ],
-            $from,
-            $offset
-        );
-
-        $nextUrl = sprintf(
-            '/api/tag/%d/forum-items?courseId=%d&from=%d&offset=%d',
-            $id,
-            $request->courseId,
-            $from + $offset,
-            10
-        );
-
-        if ($forumItems->count() != $offset) {
-            $nextUrl = null;
-        }
-
-        return new JsonResponse([
-            'data'    => $forumItems,
-            'nextUrl' => $nextUrl
-        ], JsonResponse::HTTP_OK);
-    }
-
-    /**
      * Store a newly created resource in storage.
      *
      * @param \Illuminate\Http\Request $request

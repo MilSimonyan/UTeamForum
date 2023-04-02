@@ -94,13 +94,13 @@ enter sensitive information, such as a password.
   Content-Type: multipart/form-data
 ```
 
-| Parameter  | Type        | Description                                                      |
-|:-----------|:------------|:-----------------------------------------------------------------|
-| `title`    | `string`    | **Required**.  The title of the post **Length** min:3 max:100    |
-| `content`  | `string`    | **Required**.  The content of the post **Length** min:3 max:3000 |
-| `media`    | `mimes`     | **Optional**. jpg,jpeg,png,gif,mp4,mov,ogg                       |
-| `tags`     | `array:int` | **Optional**.  The tags(id) must be exists                       |
-| `courseId` | `int`       | **Required**. Must be exists                                     |
+| Parameter  | Type            | Description                                                      |
+|:-----------|:----------------|:-----------------------------------------------------------------|
+| `title`    | `string`        | **Required**.  The title of the post **Length** min:3 max:100    |
+| `content`  | `string`        | **Required**.  The content of the post **Length** min:3 max:3000 |
+| `media`    | `mimes`         | **Optional**. jpg,jpeg,png,gif,mp4,mov,ogg                       |
+| `tags`     | `array:strings` | **Optional**.  The tag of the post                               |
+| `courseId` | `int`           | **Required**. Must be exists                                     |
 
 ### Update a post
 
@@ -110,12 +110,12 @@ enter sensitive information, such as a password.
   Content-Type: multipart/form-data
 ```
 
-| Parameter | Type        | Description                                                      |
-|:----------|:------------|:-----------------------------------------------------------------|
-| `title`   | `string`    | **Optional**.  The title of the post **Length** min:3 max:100    |
-| `content` | `string`    | **Optional**.  The content of the post **Length** min:3 max:3000 |
-| `media`   | `mimes`     | **Optional**. jpg,jpeg,png,gif,mp4,mov,ogg                       |
-| `tags`    | `array:int` | **Optional**.  The tags(id) must be exists                       |
+| Parameter | Type            | Description                                                      |
+|:----------|:----------------|:-----------------------------------------------------------------|
+| `title`   | `string`        | **Optional**.  The title of the post **Length** min:3 max:100    |
+| `content` | `string`        | **Optional**.  The content of the post **Length** min:3 max:3000 |
+| `media`   | `mimes`         | **Optional**. jpg,jpeg,png,gif,mp4,mov,ogg                       |
+| `tags`    | `array:strings` | **Optional**.  The tag of the post                               |
 
 ### Show a post
 
@@ -163,13 +163,13 @@ enter sensitive information, such as a password.
   Content-Type: multipart/form-data
 ```
 
-| Parameter  | Type        | Description                                                          |
-|:-----------|:------------|:---------------------------------------------------------------------|
-| `title`    | `string`    | **Required**.  The title of the question **Length** min:3 max:100    |
-| `content`  | `string`    | **Required**.  The content of the question **Length** min:3 max:3000 |
-| `media`    | `mimes`     | **Optional**. jpg,jpeg,png,gif,mp4,mov,ogg                           |
-| `tags`     | `array:int` | **Optional**.  The tags(id) must be exists                           |
-| `courseId` | `int`       | **Required**. Must be exists                                         |
+| Parameter  | Type            | Description                                                          |
+|:-----------|:----------------|:---------------------------------------------------------------------|
+| `title`    | `string`        | **Required**.  The title of the question **Length** min:3 max:100    |
+| `content`  | `string`        | **Required**.  The content of the question **Length** min:3 max:3000 |
+| `media`    | `mimes`         | **Optional**. jpg,jpeg,png,gif,mp4,mov,ogg                           |
+| `tags`     | `array:strings` | **Optional**.  The tags of the question                              |
+| `courseId` | `int`           | **Required**. Must be exists                                         |
 
 ### Update a question you can update question 5 minutes after adding
 
@@ -179,12 +179,12 @@ enter sensitive information, such as a password.
   Content-Type: multipart/form-data
 ```
 
-| Parameter | Type        | Description                                                          |
-|:----------|:------------|:---------------------------------------------------------------------|
-| `title`   | `string`    | **Optional**.  The title of the question **Length** min:3 max:100    |
-| `content` | `string`    | **Optional**.  The content of the question **Length** min:3 max:3000 |
-| `media`   | `mimes`     | **Optional**. jpg,jpeg,png,gif,mp4,mov,ogg                           |
-| `tags`    | `array:int` | **Optional**.  The tags(id) must be exists                           |
+| Parameter | Type            | Description                                                          |
+|:----------|:----------------|:---------------------------------------------------------------------|
+| `title`   | `string`        | **Optional**.  The title of the question **Length** min:3 max:100    |
+| `content` | `string`        | **Optional**.  The content of the question **Length** min:3 max:3000 |
+| `media`   | `mimes`         | **Optional**. jpg,jpeg,png,gif,mp4,mov,ogg                           |
+| `tags`    | `array:strings` | **Optional**.  The tags of the question                              |
 
 ### Get question comments(0-5). To sort the records in descending order of created_at
 
@@ -291,7 +291,7 @@ enter sensitive information, such as a password.
   GET /api/tag/{id}
 ```
 
-### Create a new tag
+### Create a new tag (Tag is created with Question and Post) 
 
 ```http
   POST /api/tag/
@@ -304,17 +304,11 @@ enter sensitive information, such as a password.
 | `name`     | `string` | **Required**.  The name of the tag **Length** min:2 max:30 **Unique**. name |
 | `courseId` | `int`    | **Required**                                                                |
 
-### Get a forum items where have selected tag(0-10). To sort the records in descending order of created_at
-
-```http
-  GET /api/tag/{id}/forum-items?courseId={id}
-
-```
 
 ### Paginate a forum items where have selected tag. To sort the records in descending order of created_at
 
 ```http
-  GET /api/tag/{id}/forum-items?courseId={id}&from=0&offset=10
+  GET /api/tag/{tag_name}/forum-items?courseId={id}&from=0&offset=10
 ```
 
 ## FORUM
@@ -323,6 +317,12 @@ enter sensitive information, such as a password.
 
 ```http
   GET /api/forum?courseId=?
+```
+
+### Get a forum items where have selected tag(tagName). To sort the records in descending order of created_at
+
+```http
+  GET /api/forum?courseId=?&filter={tagName}
 ```
 
 ### Paginate forum items(questions & posts) To sort the records in descending order of created_at
