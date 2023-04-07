@@ -137,7 +137,7 @@ class PostController extends Controller
         $this->validate($request, [
             'title'   => ['string', 'min:3', 'max:100'],
             'content' => ['string', 'min:3', 'max:3000'],
-            'media'   => ['mimes:jpg,jpeg,png,gif,mp4,mov,ogg'],
+            'media'   => ['mimes:jpg,jpeg,png'],
             'tags'    => ['array'],
         ]);
 
