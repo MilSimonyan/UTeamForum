@@ -44,27 +44,43 @@ class CommentRateController extends Controller
             false
         );
 
+        $needToUpdateCommentRate = true;
+
         if ($rateByMe) {
             $commentRate = $rateByMe;
+
+            if ($commentRate->value === $request->get('value')) {
+                $needToUpdateCommentRate = false;
+            }
+
+            if ($request->get('value') === 0) {
+                $comment = Comment::find($commentRate->commentId);
+                $comment->rate -= $commentRate->value;
+                $comment->save();
+
+                $rateByMe->delete();
+
+                return new JsonResponse(0, JsonResponse::HTTP_OK);
+            }
+        } else {
+            if ($request->get('value') === 0) {
+                return new JsonResponse(0, JsonResponse::HTTP_OK);
+            }
         }
 
-        if (!$rateByMe || $request->get('value')) {
-            $commentRate = $commentRate ?? new CommentRate();
-            $commentRate->commentId = $request->get('commentId');
-            $commentRate->value = $request->get('value');
-            $commentRate->userRole = $request->user()->getRole();
-            $commentRate->userId = $request->user()->getId();
-            $commentRate->save();
+        $commentRate = $commentRate ?? new CommentRate();
+        $commentRate->commentId = $request->get('commentId');
+        $commentRate->value = $request->get('value');
+        $commentRate->userRole = $request->user()->getRole();
+        $commentRate->userId = $request->user()->getId();
+        $commentRate->save();
 
+        if ($needToUpdateCommentRate) {
             $comment = Comment::find($commentRate->commentId);
-            $comment->rate += $commentRate->value;
+            $comment->rate = 2 * $commentRate->value + $comment->rate;
             $comment->save();
-
-            return new JsonResponse($commentRate->value, JsonResponse::HTTP_OK);
         }
 
-        $rateByMe->delete();
-
-        return new JsonResponse(0, JsonResponse::HTTP_OK);
+        return new JsonResponse($commentRate->value, JsonResponse::HTTP_OK);
     }
 }
