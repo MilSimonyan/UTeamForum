@@ -19,8 +19,8 @@ class PostController extends Controller
         protected PostRepository $postRepository,
         protected ImageAdapter $imageAdapter
     ) {
-        $this->imageAdapter->supportHeight = 800;
-        $this->imageAdapter->supportWidth = 600;
+        $this->imageAdapter->supportHeight = 500;
+        $this->imageAdapter->supportWidth = 900;
     }
 
     /**

@@ -16,7 +16,7 @@ class CommentController extends Controller
         protected ImageAdapter $imageAdapter
     ) {
         $this->imageAdapter->supportHeight = 600;
-        $this->imageAdapter->supportWidth = 400;
+        $this->imageAdapter->supportWidth = 1050;
     }
 
     /**
