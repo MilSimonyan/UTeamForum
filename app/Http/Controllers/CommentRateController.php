@@ -35,19 +35,18 @@ class CommentRateController extends Controller
             'value.in' => 'The value must be -1, 0, or 1.',
         ]);
 
-        $rateByMe = $this->commentRateRepository->findOneBy(
-            [
-                ['comment_id', $request->get('commentId')],
-                ['user_id', Auth::user()->getId()],
-                ['user_role', Auth::user()->getRole()]
-            ],
-            false
-        );
+        $rateByMe = $this->commentRateRepository->findOneBy([
+            ['comment_id', $request->get('commentId')],
+            ['user_id', Auth::user()->getId()],
+            ['user_role', Auth::user()->getRole()]
+        ], false);
 
         $needToUpdateCommentRate = true;
+        $rateByMeValue = 0;
 
         if ($rateByMe) {
             $commentRate = $rateByMe;
+            $rateByMeValue = $rateByMe->value;
 
             if ($commentRate->value === $request->get('value')) {
                 $needToUpdateCommentRate = false;
@@ -75,9 +74,18 @@ class CommentRateController extends Controller
         $commentRate->userId = $request->user()->getId();
         $commentRate->save();
 
+
         if ($needToUpdateCommentRate) {
             $comment = Comment::find($commentRate->commentId);
-            $comment->rate = 2 * $commentRate->value + $comment->rate;
+
+            if ($rateByMeValue === 1 && $commentRate->value === -1) {
+                $comment->rate -= 2;
+            } elseif ($rateByMeValue === -1 && $commentRate->value === 1) {
+                $comment->rate += 2;
+            } else {
+                $comment->rate += $commentRate->value;
+            }
+
             $comment->save();
         }
 
