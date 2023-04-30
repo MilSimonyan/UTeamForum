@@ -94,6 +94,7 @@ class PostController extends Controller
         ]);
 
         if ($file = $request->file('media')) {
+            Storage::path('.');
             $image = $this->imageAdapter->make($file);
             $this->imageAdapter->resize($image, $image->width(), $image->height());
             $filename = hash('sha256', $image->filename).'.'.$file->extension();
