@@ -98,7 +98,7 @@ class PostController extends Controller
             $image = $this->imageAdapter->make($file);
             $this->imageAdapter->resize($image, $image->width(), $image->height());
             $filename = hash('sha256', $image->filename).'.'.$file->extension();
-            $image->save(storage_path('/app/media/post/'.$filename));
+            $image->save(storage_path('app/media/post/'.$filename));
         }
 
         if ($request->get('tags')) {
