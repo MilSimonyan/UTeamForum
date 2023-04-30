@@ -37,6 +37,7 @@ class CommentController extends Controller
         ]);
 
         if ($file = $request->file('media')) {
+            Storage::disk('comment');
             $image = $this->imageAdapter->make($file);
             $this->imageAdapter->resize($image, $image->width(), $image->height());
 
