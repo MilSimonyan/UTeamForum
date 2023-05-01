@@ -37,7 +37,8 @@ class Comment extends Model
 
     protected $fillable = [
         'content',
-        'rate'
+        'rate',
+        'user_id'
     ];
 
     protected $appends = [
