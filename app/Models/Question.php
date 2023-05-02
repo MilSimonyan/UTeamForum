@@ -19,7 +19,7 @@ use stdClass;
  * @property int    $user_id
  * @property int    $course_id
  * @property int    $id
- * @property string $author
+ * @property array  $author
  * @property int    $likes
  */
 class Question extends Model

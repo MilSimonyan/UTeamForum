@@ -70,10 +70,9 @@ class QuestionGate
         try {
             /** @var Question $question */
             $question = Question::find(app()->request->id);
-            return !$user
-                    ->getCoursesIds()
-                    ->intersect($question->courseId)
-                    ->isEmpty() &&
+
+            return $user->getId() === $question->author['id'] &&
+                $user->getRole() === $question->author['role'] &&
                 !$question->comments()->count();
         } catch (Exception|Error) {
             return false;

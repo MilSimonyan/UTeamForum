@@ -52,6 +52,8 @@ class CommentGate
     }
 
     /**
+     * Allow when Comment belong to user
+     *
      * @param \Illuminate\Contracts\Auth\Authenticatable $user
      *
      * @return bool
@@ -64,12 +66,10 @@ class CommentGate
                 'question_id',
                 app()->request->questionId
             );
-            $comment = Comment::find(app()->request->id);
+            $comment = Comment::where('id', app()->request->id)->where('question_id', app()->request->questionId)->first();
 
-            return !$user
-                    ->getCoursesIds()
-                    ->intersect($comment->question()->first()->courseId)
-                    ->isEmpty() &&
+            return $user->getId() === $comment->author['id'] &&
+                $user->getRole() === $comment->author['role'] &&
                 !$comments->count();
         } catch (Exception|Error $e) {
             return false;

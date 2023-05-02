@@ -12,16 +12,16 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\Auth;
 
 /**
- * @property string     $content
- * @property string     $media
- * @property string     $userRole
- * @property integer    $userId
- * @property integer    $parentId
- * @property integer    $questionId
- * @property string     $author
- * @property int        $user_id
- * @property string     $user_role
- * @property int        $rate
+ * @property string  $content
+ * @property string  $media
+ * @property string  $userRole
+ * @property integer $userId
+ * @property integer $parentId
+ * @property integer $questionId
+ * @property array   $author
+ * @property int     $user_id
+ * @property string  $user_role
+ * @property int     $rate
  */
 class Comment extends Model
 {
