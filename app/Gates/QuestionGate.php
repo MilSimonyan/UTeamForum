@@ -14,10 +14,13 @@ class QuestionGate
      *
      * @return bool
      */
-    public function indexQuestion(Authenticatable $user) : bool
+    public function indexQuestion(Authenticatable $user): bool
     {
         try {
-            return !$user->getCoursesIds()->intersect(app()->request->courseId)->isEmpty();
+            return !$user
+                ->getCoursesIds()
+                ->intersect(app()->request->courseId)
+                ->isEmpty();
         } catch (Exception|Error) {
             return false;
         }
@@ -28,10 +31,13 @@ class QuestionGate
      *
      * @return bool
      */
-    public function showQuestion(Authenticatable $user) : bool
+    public function showQuestion(Authenticatable $user): bool
     {
         try {
-            return !$user->getCoursesIds()->intersect(Question::find(app()->request->id)->courseId)->isEmpty();
+            return !$user
+                ->getCoursesIds()
+                ->intersect(Question::find(app()->request->id)->courseId)
+                ->isEmpty();
         } catch (Exception|Error) {
             return false;
         }
@@ -42,10 +48,13 @@ class QuestionGate
      *
      * @return bool
      */
-    public function likeQuestion(Authenticatable $user) : bool
+    public function likeQuestion(Authenticatable $user): bool
     {
         try {
-            return !$user->getCoursesIds()->intersect(Question::find(app()->request->questionId)->courseId)->isEmpty();
+            return !$user
+                ->getCoursesIds()
+                ->intersect(Question::find(app()->request->questionId)->courseId)
+                ->isEmpty();
         } catch (Exception|Error) {
             return false;
         }
@@ -56,13 +65,16 @@ class QuestionGate
      *
      * @return bool
      */
-    public function updateQuestion(Authenticatable $user) : bool
+    public function updateQuestion(Authenticatable $user): bool
     {
         try {
+            /** @var Question $question */
             $question = Question::find(app()->request->id);
-
-            return !$user->getCoursesIds()->intersect($question->courseId)->isEmpty() &&
-                $question->created_at->gt(now()->subMinutes(5));
+            return !$user
+                    ->getCoursesIds()
+                    ->intersect($question->courseId)
+                    ->isEmpty() &&
+                !$question->comments()->count();
         } catch (Exception|Error) {
             return false;
         }
@@ -73,10 +85,13 @@ class QuestionGate
      *
      * @return bool
      */
-    public function storeQuestion(Authenticatable $user) : bool
+    public function storeQuestion(Authenticatable $user): bool
     {
         try {
-            return !$user->getCoursesIds()->intersect(app()->request->get('courseId'))->isEmpty();
+            return !$user
+                ->getCoursesIds()
+                ->intersect(app()->request->get('courseId'))
+                ->isEmpty();
         } catch (Exception|Error) {
             return false;
         }
@@ -87,7 +102,7 @@ class QuestionGate
      *
      * @return bool
      */
-    public function destroyQuestion(Authenticatable $user) : bool
+    public function destroyQuestion(Authenticatable $user): bool
     {
         try {
             return !Question::where('id', app()->request->id)

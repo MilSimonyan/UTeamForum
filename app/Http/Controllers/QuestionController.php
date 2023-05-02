@@ -188,7 +188,7 @@ class QuestionController extends Controller
             $filename = $file->store('/', 'question');
         }
 
-        $requestTags = array_unique($request->get('tags'));
+        $requestTags = array_unique($request->get('tags', []));
         $questionTags = $question->tags()->get()->pluck('id')->toArray();
 
         $this->checkDbAndSaveNonExistentTags($requestTags, $question->course_id);

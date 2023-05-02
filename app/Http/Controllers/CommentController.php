@@ -33,7 +33,16 @@ class CommentController extends Controller
             'content'    => ['required', 'string', 'min:3', 'max:3000'],
             'questionId' => ['required', 'exists:questions,id'],
             'media'      => ['mimes:jpg,jpeg,png,gif,mp4,mov,ogg'],
-            'parentId'   => ['integer', 'exists:comments,id'],
+            'parentId'   => [
+                'nullable',
+                'integer',
+                function ($attribute, $value, $fail) use ($request) {
+                    $comment = Comment::find($value);
+                    if ($comment && $comment->question_id != $request->questionId) {
+                        $fail('The parent_id must belong to the same question.');
+                    }
+                },
+            ],
         ]);
 
         if ($file = $request->file('media')) {
@@ -51,14 +60,14 @@ class CommentController extends Controller
         $comment->questionId = $request->get('questionId');
         $comment->media = $filename ?? null;
         $comment->userRole = $request->user()->getRole();
+        $comment->userId = $request->user()->getId();
         $comment->author = json_encode([
-            'id'        => $comment->user_id,
+            'id'        => $comment->userId,
             'firstName' => $request->user()->getFirstName(),
             'lastName'  => $request->user()->getLastName(),
-            'role'      => $comment->user_role
+            'role'      => $comment->userRole
             //            'thumbnail' => auth()->user()->getThumbnail() TODO after added from user
         ]);
-        $comment->userId = $request->user()->getId();
         $comment->parentId = $request->get('parentId');
         $comment->rate = 0;
 

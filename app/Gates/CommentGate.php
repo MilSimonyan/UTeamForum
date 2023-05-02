@@ -15,7 +15,7 @@ class CommentGate
      *
      * @return bool
      */
-    public function rateComment(Authenticatable $user) : bool
+    public function rateComment(Authenticatable $user): bool
     {
         try {
             return !$user
@@ -25,7 +25,8 @@ class CommentGate
                         ->question()
                         ->first()
                         ->courseId
-                )->isEmpty();
+                )
+                ->isEmpty();
         } catch (Exception|Error) {
             return false;
         }
@@ -36,7 +37,7 @@ class CommentGate
      *
      * @return bool
      */
-    public function showComments(Authenticatable $user) : bool
+    public function showComments(Authenticatable $user): bool
     {
         try {
             return !$user
@@ -55,17 +56,22 @@ class CommentGate
      *
      * @return bool
      */
-    public function updateComment(Authenticatable $user) : bool
+    public function updateComment(Authenticatable $user): bool
     {
         try {
+            /** @var Comment $comment */
+            $comments = Comment::where('parent_id', app()->request->id)->where(
+                'question_id',
+                app()->request->questionId
+            );
             $comment = Comment::find(app()->request->id);
 
             return !$user
                     ->getCoursesIds()
                     ->intersect($comment->question()->first()->courseId)
                     ->isEmpty() &&
-                $comment->created_at->gt(now()->subMinutes(5));
-        } catch (Exception|Error) {
+                !$comments->count();
+        } catch (Exception|Error $e) {
             return false;
         }
     }
@@ -75,7 +81,7 @@ class CommentGate
      *
      * @return bool
      */
-    public function storeComment(Authenticatable $user) : bool
+    public function storeComment(Authenticatable $user): bool
     {
         try {
             return !$user
@@ -92,7 +98,7 @@ class CommentGate
      *
      * @return bool
      */
-    public function destroyComment(Authenticatable $user) : bool
+    public function destroyComment(Authenticatable $user): bool
     {
         try {
             return !Comment::where('id', app()->request->id)
