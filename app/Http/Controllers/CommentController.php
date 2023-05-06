@@ -31,9 +31,9 @@ class CommentController extends Controller
     public function store(Request $request) : JsonResponse
     {
         $this->validate($request, [
-            'content'    => ['required', 'string', 'min:3', 'max:3000'],
+            'content'    => ['required', 'string', 'min:3', 'max:30000'],
             'questionId' => ['required', 'exists:questions,id'],
-            'media'      => ['mimes:jpg,jpeg,png,gif,mp4,mov,ogg'],
+            'media'      => ['mimes:jpg,jpeg,png,webp'],
             'parentId'   => [
                 'nullable',
                 'integer',

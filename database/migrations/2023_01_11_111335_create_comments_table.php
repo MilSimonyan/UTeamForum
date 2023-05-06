@@ -14,7 +14,7 @@ return new class extends Migration {
     {
         Schema::create('comments', function (Blueprint $table) {
             $table->id();
-            $table->string('content');
+            $table->text('content');
             $table->string('media')->default(null)->nullable();
             $table->enum('user_role', [
                 'teacher',

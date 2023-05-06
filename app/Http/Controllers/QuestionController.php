@@ -173,8 +173,8 @@ class QuestionController extends Controller
     {
         $this->validate($request, [
             'title'   => ['string', 'min:3', 'max:100'],
-            'content' => ['string', 'min:3', 'max:3000'],
-            'media'   => ['mimes:jpg,jpeg,png,gif,mp4,mov,ogg'],
+            'content' => ['string', 'min:3', 'max:30000'],
+            'media'   => ['mimes:jpg,jpeg,png,webp'],
             'tags'    => ['array'],
         ]);
 

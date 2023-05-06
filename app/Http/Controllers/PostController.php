@@ -88,8 +88,8 @@ class PostController extends Controller
     {
         $this->validate($request, [
             'title'    => ['required', 'string', 'min:3', 'max:100'],
-            'content'  => ['required', 'string', 'min:3', 'max:3000'],
-            'media'    => ['mimes:jpg,jpeg,png'],
+            'content'  => ['required', 'string', 'min:3', 'max:30000'],
+            'media'    => ['mimes:jpg,jpeg,png,webp'],
             'tags'     => ['array'],
             'courseId' => ['required', 'integer'],
         ]);
