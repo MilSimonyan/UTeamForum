@@ -82,6 +82,7 @@ class PostController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      * @throws \Illuminate\Validation\ValidationException
+     * @throws \JsonException
      */
     public function store(Request $request): JsonResponse
     {
@@ -117,9 +118,9 @@ class PostController extends Controller
             'id'        => $post->user_id,
             'firstName' => $request->user()->getFirstName(),
             'lastName'  => $request->user()->getLastName(),
-            'role'      => $post->user_role
-            //            'thumbnail' => auth()->user()->getThumbnail() TODO after added from user
-        ]);
+            'role'      => $post->user_role,
+            'thumbnail' => $request->user()->getThumbnail()
+        ], JSON_THROW_ON_ERROR);
         $post->course_id = $request->get('courseId');
         $post->likes = 0;
 
@@ -150,7 +151,11 @@ class PostController extends Controller
                 Storage::disk('post')->delete($post->media);
             }
 
-            $filename = $file->store('/', 'post');
+            Storage::disk('post');
+            $image = $this->imageAdapter->make($file);
+            $this->imageAdapter->resize($image, $image->width(), $image->height());
+            $filename = hash('sha256', $image->filename).'.'.$file->extension();
+            $image->save(storage_path('app/media/post/'.$filename));
         }
 
         $requestTags = array_unique($request->get('tags'));
@@ -158,12 +163,11 @@ class PostController extends Controller
         $this->checkDbAndSaveNonExistentTags($requestTags, $post->course_id);
         $requestTags = Tag::whereIn('name', $requestTags)->pluck('id')->toArray();
 
-
         $difference = array_diff($postTags, $requestTags);
 
         $post->title = $request->get('title', $post->title);
         $post->content = $request->get('content', $post->content);
-        $post->media = $filename ?? null;
+        $post->media = $filename ?? pathinfo($post->media)['basename'];
         $post->user_role = $request->user()->getRole();
         $post->user_id = $request->user()->getId();
         $post->course_id = $request->get('courseId', $post->course_id);

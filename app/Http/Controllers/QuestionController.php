@@ -117,6 +117,7 @@ class QuestionController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      * @throws \Illuminate\Validation\ValidationException
+     * @throws \JsonException
      */
     public function store(Request $request): JsonResponse
     {
@@ -152,9 +153,9 @@ class QuestionController extends Controller
             'id'        => $question->user_id,
             'firstName' => $request->user()->getFirstName(),
             'lastName'  => $request->user()->getLastName(),
-            'role'      => $question->user_role
-            //            'thumbnail' => auth()->user()->getThumbnail() TODO after added from user
-        ]);
+            'role'      => $question->user_role,
+            'thumbnail' => $request->user()->getThumbnail()
+        ], JSON_THROW_ON_ERROR);
         $question->course_id = $request->get('courseId');
         $question->likes = 0;
 
@@ -185,7 +186,11 @@ class QuestionController extends Controller
                 Storage::disk('question')->delete($question->media);
             }
 
-            $filename = $file->store('/', 'question');
+            Storage::disk('question');
+            $image = $this->imageAdapter->make($file);
+            $this->imageAdapter->resize($image, $image->width(), $image->height());
+            $filename = hash('sha256', $image->filename).'.'.$file->extension();
+            $image->save(storage_path('app/media/question/'.$filename));
         }
 
         $requestTags = array_unique($request->get('tags', []));
@@ -198,7 +203,7 @@ class QuestionController extends Controller
 
         $question->title = $request->get('title', $question->title);
         $question->content = $request->get('content', $question->content);
-        $question->media = $filename ?? $question->media;
+        $question->media = $filename ?? pathinfo($question->media)['basename'];
         $question->user_role = $request->user()->getRole();
         $question->user_id = $request->user()->getId();
         $question->save();

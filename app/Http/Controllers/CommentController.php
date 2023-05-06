@@ -26,6 +26,7 @@ class CommentController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      * @throws \Illuminate\Validation\ValidationException
+     * @throws \JsonException
      */
     public function store(Request $request) : JsonResponse
     {
@@ -38,7 +39,7 @@ class CommentController extends Controller
                 'integer',
                 function ($attribute, $value, $fail) use ($request) {
                     $comment = Comment::find($value);
-                    if ($comment && $comment->question_id != $request->questionId) {
+                    if ($comment && $comment->question_id !== $request->questionId) {
                         $fail('The parent_id must belong to the same question.');
                     }
                 },
@@ -65,9 +66,9 @@ class CommentController extends Controller
             'id'        => $comment->userId,
             'firstName' => $request->user()->getFirstName(),
             'lastName'  => $request->user()->getLastName(),
-            'role'      => $comment->userRole
-            //            'thumbnail' => auth()->user()->getThumbnail() TODO after added from user
-        ]);
+            'role'      => $comment->userRole,
+            'thumbnail' => $request->user()->getThumbnail()
+        ], JSON_THROW_ON_ERROR);
         $comment->parentId = $request->get('parentId');
         $comment->rate = 0;
 
@@ -94,11 +95,17 @@ class CommentController extends Controller
                 Storage::disk('comment')->delete($comment->media);
             }
 
-            $filename = $file->store('/', 'comment');
+            Storage::disk('comment');
+            $image = $this->imageAdapter->make($file);
+            $this->imageAdapter->resize($image, $image->width(), $image->height());
+
+            $filename = hash('sha256', $image->filename).'.'.$file->extension();
+
+            $image->save(storage_path('/app/media/comment/'.$filename));
         }
 
         $comment->content = $request->get('content', $comment->content);
-        $comment->media = $filename ?? $comment->media;
+        $comment->media = $filename ?? pathinfo($comment->media)['basename'];
         $comment->userRole = $request->user()->getRole();
         $comment->userId = $request->user()->getId();
 

@@ -47,10 +47,10 @@ class User implements Jsonable, JsonSerializable, Authenticatable
      */
     private string $role;
 
-//    /**
-//     * @var string
-//     */
-//    private string $thumbnail; TODO in process...
+    /**
+     * @var string
+     */
+    private string $thumbnail;
 
     /**
      * @var string|null
@@ -365,7 +365,7 @@ class User implements Jsonable, JsonSerializable, Authenticatable
             'position'    => $this->getPosition(),
             'courses'     => $this->getCourses(),
             'departments' => $this->getDepartments(),
-//            'thumbnail'   => $this->getThumbnail() TODO after added from user
+            'thumbnail'   => $this->getThumbnail()
         ];
     }
 
@@ -395,7 +395,7 @@ class User implements Jsonable, JsonSerializable, Authenticatable
         $this->setBirthDate($userData->birthDate ?? null);
         $this->setRole($userData->role);
         $this->setPosition($userData->position ?? null);
-//        $this->setThumbnail($userData->thumbnail); TODO after added from user
+        $this->setThumbnail($userData->thumbnail);
         $this->setCourses();
         $this->setDepartments();
 
