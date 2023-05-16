@@ -158,7 +158,7 @@ class PostController extends Controller
             $image->save(storage_path('app/media/post/'.$filename));
         }
 
-        $requestTags = array_unique($request->get('tags'));
+        $requestTags = array_unique($request->get('tags', []));
         $postTags = $post->tags()->get()->pluck('id')->toArray();
         $this->checkDbAndSaveNonExistentTags($requestTags, $post->course_id);
         $requestTags = Tag::whereIn('name', $requestTags)->pluck('id')->toArray();
